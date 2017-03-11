@@ -1,4 +1,5 @@
-var website = 'http://localhost/PhonePos/';
+// var website = 'http://localhost/PhonePos/';
+var website = 'http://123.206.23.41/PhonePos/';
 var urlLogin = website + 'user.php';
 var urlGetPerson = website + 'user.php';
 var urlSettingPerson = website + 'user.php';
@@ -115,6 +116,7 @@ angular.module('phonepos.controllers', [])
       console.log('select commodity start:', $scope.tradeData.plucode);
       $http.post(urlTrade, {
         data: plucode,
+        username: username,
         method: 'selectCommodity'
       }).success(function (response) {
         console.log('select commodity success:', response);
