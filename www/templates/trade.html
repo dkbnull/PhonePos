@@ -1,0 +1,54 @@
+<ion-view view-title="销售">
+  <ion-content>
+    <div class="padding trade-info">
+      顾客类型：
+      <span class="trade-number" ng-bind="tradeData.customer"></span>
+    </div>
+    <div class="padding trade-main">
+      <div class="padding-bottom trade-item">
+        <div class="trade-item-no">序号</div>
+        <div class="trade-item-code">商品编码</div>
+        <div class="trade-item-name">商品名称</div>
+        <div class="trade-item-price">价格</div>
+        <div class="trade-item-number">数量</div>
+        <div class="trade-item-total">总价</div>
+      </div>
+      <ion-list show-delete="tradeData.clearLine">
+        <ion-item class="trade-list-item" ng-repeat="commod in tradeData.commodity">
+          <div class="padding-bottom trade-item">
+            <div class="trade-item-no">{{commod.no}}</div>
+            <div class="trade-item-code">{{commod.code}}</div>
+            <div class="trade-item-name">{{commod.name}}</div>
+            <div class="trade-item-price">{{commod.price}}</div>
+            <div class="trade-item-number">{{commod.number}}</div>
+            <div class="trade-item-total">{{commod.total}}</div>
+            <ion-delete-button class="ion-minus-circled button-delete" ng-click="tradeClearLineItem(commod)">
+            </ion-delete-button>
+          </div>
+        </ion-item>
+      </ion-list>
+    </div>
+    <div class="padding trade-info">
+      合计：
+      <span class="trade-total" ng-bind="tradeData.total"></span>
+      元
+    </div>
+    <form class="padding-top padding-bottom">
+      <label class="item item-input">
+        <input type="text" ng-model="tradeData.plucode" placeholder="请输入商品编码">
+      </label>
+    </form>
+    <div class="padding-bottom">
+      <button class="button button-positive button-total" ng-click="tradeTotal()">合计</button>
+      <button class="button button-balanced button-confirm" ng-click="tradeConfirm()">确认</button>
+    </div>
+    <div class="padding-bottom">
+      <button class="button button-positive button-vip" ng-click="tradeVip()">会员</button>
+      <button class="button button-positive button-clearline" ng-click="tradeClearLine()">行清</button>
+      <button class="button button-positive button-clearall" ng-click="tradeClearAll()">总清</button>
+    </div>
+    <div>
+      <button class="button button-positive button-order" ng-click="tradeOrder()">查询订单</button>
+    </div>
+  </ion-content>
+</ion-view>

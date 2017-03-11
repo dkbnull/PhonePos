@@ -1,0 +1,30 @@
+<ion-view>
+  <ion-header-bar>
+    <button class="button button-clear button-dark" ui-sref="setting.app">
+      <i class="icon ion-ios-arrow-back"></i>
+    </button>
+    <h1 class="title">问题反馈</h1>
+  </ion-header-bar>
+  <ion-content class="has-header">
+    <form ng-submit="feedback()">
+      <div class="list list-inset">
+        <label class="item item-divider">
+          <span>问题说明</span>
+        </label>
+        <label class="item item-input">
+          <textarea class="feedback-problem" ng-model="feedbackData.problem"></textarea>
+          <!--<input type="text" ng-model="feedbackData.problem">-->
+        </label>
+        <label class="item item-divider">
+          <span>联系电话</span>
+        </label>
+        <label class="item item-input">
+          <input type="number" ng-model="feedbackData.phone">
+        </label>
+        <label>
+          <button class="button button-block button-positive" type="submit">提交</button>
+        </label>
+      </div>
+    </form>
+  </ion-content>
+</ion-view>

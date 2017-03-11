@@ -1,0 +1,35 @@
+<ion-modal-view>
+  <ion-header-bar class="bar-positive">
+    <h1 class="title">订单</h1>
+    <a class="button" ng-click="closeTradeOrder()">关闭</a>
+  </ion-header-bar>
+  <ion-content>
+    <div class="padding trade-info">
+      订单号：
+      <span class="trade-number" ng-bind="tradeData.order"></span>
+    </div>
+    <div class="padding trade-main">
+      <div class="padding-bottom trade-item">
+        <div class="trade-item-no">序号</div>
+        <div class="trade-item-code">商品编码</div>
+        <div class="trade-item-name">商品名称</div>
+        <div class="trade-item-price">价格</div>
+        <div class="trade-item-number">数量</div>
+        <div class="trade-item-total">总价</div>
+      </div>
+      <div class="padding-bottom trade-item" ng-repeat="commod in tradeData.commodity">
+        <div class="trade-item-no">{{commod.no}}</div>
+        <div class="trade-item-code">{{commod.code}}</div>
+        <div class="trade-item-name">{{commod.name}}</div>
+        <div class="trade-item-price">{{commod.price}}</div>
+        <div class="trade-item-number">{{commod.number}}</div>
+        <div class="trade-item-total">{{commod.total}}</div>
+      </div>
+    </div>
+    <div class="padding trade-info">
+      合计：
+      <span class="trade-total" ng-bind="tradeData.total"></span>
+      元
+    </div>
+  </ion-content>
+</ion-modal-view>
