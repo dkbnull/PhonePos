@@ -1,5 +1,6 @@
 /**
 trade.html
+trade-*.html
  */
 .trade-info {
   width: 100%;
@@ -30,12 +31,16 @@ trade.html
 .trade-item-no,
 .trade-item-price,
 .trade-item-number,
-.trade-item-total {
+.trade-item-total,
+.trade-pay-item-no {
   flex: 1;
 }
 
 .trade-item-code,
-.trade-item-name {
+.trade-item-name,
+.trade-pay-item-code,
+.trade-pay-item-name,
+.trade-pay-item-price {
   flex: 3;
 }
 
@@ -52,8 +57,15 @@ trade.html
   padding: 0;
 }
 
-.trade-total {
+.trade-total,
+.trade-haspay,
+.trade-nopay,
+.trade-change {
   font-size: 1.5em;
+}
+
+.trade-nopay {
+  color: #ff3b30;
 }
 
 .button-total {
@@ -94,6 +106,12 @@ trade.html
 .popup-container .commodity-input {
   width: 50%;
   margin-top: -10px;
+}
+
+.button-pay-mode {
+  width: 32%;
+  float: left;
+  margin: 0.66%;
 }
 
 /**

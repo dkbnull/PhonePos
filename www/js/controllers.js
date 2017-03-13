@@ -1,5 +1,5 @@
-// var website = 'http://localhost/PhonePos/';
-var website = 'http://123.206.23.41/PhonePos/';
+var website = 'http://localhost/PhonePos/';
+// var website = 'http://123.206.23.41/PhonePos/';
 var urlLogin = website + 'user.php';
 var urlGetPerson = website + 'user.php';
 var urlSettingPerson = website + 'user.php';
@@ -74,7 +74,7 @@ angular.module('phonepos.controllers', [])
   .controller('tradeCtrl', function ($scope, $http, $ionicModal, $ionicPopup) {
     $scope.tradeData = {};
 
-    $ionicModal.fromTemplateUrl('templates/trade-order.html', {
+    $ionicModal.fromTemplateUrl('templates/trade-pay.html', {
       scope: $scope,
       animation: "slide-in-up"
     }).then(function (modal) {
@@ -89,12 +89,20 @@ angular.module('phonepos.controllers', [])
     var plucode;
     // 已添加的商品
     var commodity = '';
+    // 会员卡面号
+    var cardfaceno = '';
     // 是否验证会员，0：非会员；1：会员
     var isvip = 0;
-    // 订单合计
+    // 订单合计（应付）
     var total = 0;
+    // 已付，未付，找零
+    var hasPay = 0, noPay = 0, change = 0;
+    // 已使用的支付方式
+    var pay = '';
+
 
     $scope.tradeData.customer = '普通';
+    total = total.toFixed(2);
     $scope.tradeData.total = total;
 
     // 点击确认按钮
@@ -128,7 +136,7 @@ angular.module('phonepos.controllers', [])
           template: '网络异常',
           okText: '确定'
         });
-      })
+      });
     };
 
     // 点击行清按钮
@@ -166,6 +174,7 @@ angular.module('phonepos.controllers', [])
           $scope.tradeData.commodity = '';
           commodity = '';
           total = 0;
+          total = total.toFixed(2);
           $scope.tradeData.total = total;
           console.log('tradeClearAll begin:',
             '$scope.tradeData.commodity:' + $scope.tradeData.commodity +
@@ -223,17 +232,71 @@ angular.module('phonepos.controllers', [])
         return false;
       }
 
-      //生成订单号，订单号 = 当前时间(yyyyMMddHHmm) + 用户编码 + 四位随机数
+      //生成流水号，流水号 = 当前时间(yyyyMMddHHmm) + 用户编码 + 四位随机数
       var randNum = Math.round(Math.random() * 1000);
       randNum = formatNumber(randNum, 4, '0', 'l');
       $scope.tradeData.order = formatDate(new Date()) + usercode + randNum;
 
-      $scope.modal.show();
+      hasPay = hasPay.toFixed(2);
+      noPay = parseFloat(total).toFixed(2);
+      change = change.toFixed(2);
+      $scope.tradeData.hasPay = hasPay;
+      $scope.tradeData.noPay = noPay;
+      $scope.tradeData.change = change;
+
+      loadPayMode();
     };
 
-    // 点击 trade-order.html 关闭按钮
-    $scope.closeTradeOrder = function () {
-      $scope.modal.hide();
+    // 点击 trade-pay.html 关闭按钮
+    $scope.closeTradePay = function () {
+      $ionicPopup.confirm({
+        title: '提示',
+        template: '确认关闭支付页面',
+        okText: '确定',
+        cancelText: '取消'
+      }).then(function (result) {
+        if (result) {
+          $scope.modal.hide();
+        }
+      });
+    };
+
+    // 点击 trade-pay.html 某一支付方式按钮
+    $scope.tradePayMode = function (pm) {
+      $scope.popupTradeData = {};
+
+      if ($scope.tradeData.noPay == 0) {
+        $ionicPopup.alert({
+          title: '提示',
+          template: '当前订单已支付完成，无需再进行支付',
+          okText: '确定'
+        });
+      } else {
+        $ionicPopup.show({
+          title: pm['payname'],
+          template: '<input type="number" placeholder="请输入支付金额" ng-model="popupTradeData.total">',
+          scope: $scope,
+          buttons: [
+            {
+              text: "取消",
+              onTap: function () {
+                return false;
+              }
+            },
+            {
+              text: "确定",
+              type: "button-positive",
+              onTap: function () {
+                return true;
+              }
+            }
+          ]
+        }).then(function (result) {
+          if (result) {
+            payOrder(pm, $scope.popupTradeData.total);
+          }
+        });
+      }
     };
 
     /**
@@ -338,27 +401,27 @@ angular.module('phonepos.controllers', [])
               '"name": "' + pluname + '",' +
               '"price": "' + price + '",' +
               '"number": "' + number + '",' +
-              '"total": "' + price * number + '"' +
+              '"total": "' + (price * number).toFixed(2) + '"' +
               '}';
           } else {
             no = $scope.tradeData.commodity.length + 1;
-            commodity = commodity + ',{' +
+            commodity += ',{' +
               '"no": "' + no + '",' +
               '"code": "' + plucode + '",' +
               '"name": "' + pluname + '",' +
               '"price": "' + price + '",' +
               '"number": "' + number + '",' +
-              '"total": "' + price * number + '"' +
+              '"total": "' + (price * number).toFixed(2) + '"' +
               '}';
           }
+          console.log('makeTradeCommodity success commodity:', commodity);
 
-          total += price * number;
+          total = parseFloat(total) + price * number;
+          total = total.toFixed(2);
           var commodityJSON = '[' + commodity + ']';
           $scope.tradeData.commodity = JSON.parse(commodityJSON);
           $scope.tradeData.total = total;
-
-          console.log('makeTradeCommodity success:', commodity);
-          console.log('makeTradeCommodity success:', $scope.tradeData.commodity);
+          console.log('makeTradeCommodity success tradeData.commodity:', $scope.tradeData.commodity);
         }
         $scope.popupTradeData.number = '';
       });
@@ -389,26 +452,27 @@ angular.module('phonepos.controllers', [])
       console.log('clearLineCommodity reset commodity success:', commodity);
 
       // 将合计中总金额减去相应商品价格
-      total -= price;
+      total = parseFloat(total) - price;
+      total = total.toFixed(2);
       $scope.tradeData.total = total;
     }
 
     /**
      * 会员验证
      *
-     * @param cardfaceno 卡面号
+     * @param cardfno 卡面号
      */
-    function verifyVip(cardfaceno) {
-      if (cardfaceno == '' || cardfaceno == null || cardfaceno == undefined) {
+    function verifyVip(cardfno) {
+      if (cardfno == '' || cardfno == null || cardfno == undefined) {
         $ionicPopup.alert({
           title: '提示',
           template: '卡号不能为空',
           okText: '确定'
         });
       } else {
-        console.log('verifyVip start:', cardfaceno);
+        console.log('verifyVip start:', cardfno);
         $http.post(urlTrade, {
-          data: cardfaceno,
+          data: cardfno,
           username: username,
           method: 'vipVerify'
         }).success(function (response) {
@@ -416,6 +480,7 @@ angular.module('phonepos.controllers', [])
           if (response.msgcode == 1) {
             $scope.tradeData.customer = '会员（' + response.msgmain.name + '）';
             isvip = 1;
+            cardfaceno = cardfno;
           } else {
             $ionicPopup.alert({
               title: '提示',
@@ -433,6 +498,139 @@ angular.module('phonepos.controllers', [])
         })
       }
     }
+
+    /**
+     * 上传流水信息
+     */
+    function saveSaleOrder() {
+      console.log('saveSaleOrder start:', $scope.tradeData.commodity);
+      $http.post(urlTrade, {
+        data: $scope.tradeData.commodity,
+        username: username,
+        order: $scope.tradeData.order,
+        total: $scope.tradeData.total,
+        cardfaceno: cardfaceno,
+        method: 'saveSaleOrder'
+      }).success(function (response) {
+        console.log('saveSaleOrder success:', response);
+        if (response.msgcode == 1) {
+
+        }
+      }).error(function () {
+        console.log('saveSaleOrder fail:', '网络异常');
+        $ionicPopup.alert({
+          title: '提示',
+          template: '网络异常',
+          okText: '确定'
+        });
+      });
+    }
+
+    /**
+     * 加载支付方式
+     */
+    function loadPayMode() {
+      console.log('loadPayMode start');
+      $http.post(urlTrade, {
+        method: 'loadPayMode'
+      }).success(function (response) {
+        console.log('loadPayMode success:', response);
+        if (response.msgcode == 1) {
+          $scope.tradeData.payMode = response.msgmain;
+          $scope.modal.show();
+        }
+      }).error(function () {
+        console.log('load pay mode fail:', '网络异常');
+        $ionicPopup.alert({
+          title: '提示',
+          template: '网络异常',
+          okText: '确定'
+        });
+      });
+    }
+
+    /**
+     * 支付订单
+     *
+     * @param pm 支付方式payMode
+     * @param total 支付金额
+     */
+    function payOrder(pm, total) {
+      if (total <= 0) {
+        $ionicPopup.alert({
+          title: '提示',
+          template: '支付金额错误',
+          okText: '确定'
+        });
+        return false;
+      } else if (total == '' || total == null || total == undefined) {
+        $ionicPopup.alert({
+          title: '提示',
+          template: '支付金额不能为空',
+          okText: '确定'
+        });
+        return false;
+      }
+
+      total = total.toFixed(2);
+      if (pay == '') {
+        pay = '{' +
+          '"no": "1",' +
+          '"code": "' + pm["paycode"] + '",' +
+          '"name": "' + pm["payname"] + '",' +
+          '"price": "' + total + '"' +
+          '}';
+      } else {
+        var no = $scope.tradeData.pay.length + 1;
+        pay += ',{' +
+          '"no": "' + no + '",' +
+          '"code": "' + pm["paycode"] + '",' +
+          '"name": "' + pm["payname"] + '",' +
+          '"price": "' + total + '"' +
+          '}';
+      }
+      console.log('payOrder success pay:', pay);
+
+      var payJSON = '[' + pay + ']';
+      $scope.tradeData.pay = JSON.parse(payJSON);
+      console.log('payOrder success tradeData.pay:', $scope.tradeData.pay);
+
+      hasPay = parseFloat(hasPay) + parseFloat(total);
+      hasPay = parseFloat(hasPay).toFixed(2);
+      noPay = parseFloat(noPay) - total;
+      if (noPay >= 0) {
+        noPay = noPay.toFixed(2);
+      } else {
+        change = -noPay;
+        change = change.toFixed(2);
+        noPay = 0;
+        noPay = noPay.toFixed(2);
+      }
+      $scope.tradeData.hasPay = hasPay;
+      $scope.tradeData.noPay = noPay;
+      $scope.tradeData.change = change;
+    }
+
+
+    // console.log('payOrder start pm:', pm);
+    // console.log('payOrder start total:', total);
+    // $http.post(urlTrade, {
+    //   data: pm,
+    //   username: username,
+    //   order: $scope.tradeData.order,
+    //   total: total,
+    //   method: 'payOrder'
+    // }).success(function (response) {
+    //   console.log('payOrder success:', response);
+    //
+    // }).error(function () {
+    //   console.log('payOrder fail:', '网络异常');
+    //   $ionicPopup.alert({
+    //     title: '提示',
+    //     template: '网络异常',
+    //     okText: '确定'
+    //   });
+    // });
   })
 
   /**
