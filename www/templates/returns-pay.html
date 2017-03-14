@@ -1,0 +1,62 @@
+<ion-modal-view>
+  <ion-header-bar class="bar-positive">
+    <h1 class="title">退款</h1>
+    <a class="button" ng-click="closeReturnsPay()">关闭</a>
+  </ion-header-bar>
+  <ion-content>
+    <div class="padding trade-info">
+      流水号：
+      <span class="trade-number" ng-bind="returnsData.order"></span>
+      <br>
+      顾客类型：
+      <span class="trade-number" ng-bind="returnsData.customer"></span>
+    </div>
+    <div class="padding trade-main">
+      <div class="padding-bottom trade-item">
+        <div class="trade-pay-item-no">序号</div>
+        <div class="trade-pay-item-code">退款编码</div>
+        <div class="trade-pay-item-name">退款名称</div>
+        <div class="trade-pay-item-price">退款金额</div>
+      </div>
+      <ion-list show-delete="returnsData.deletePay">
+        <ion-item class="trade-list-item" ng-repeat="r in returnsData.pay">
+          <div class="padding-bottom trade-item">
+            <div class="trade-pay-item-no">{{p.no}}</div>
+            <div class="trade-pay-item-code">{{p.code}}</div>
+            <div class="trade-pay-item-name">{{p.name}}</div>
+            <div class="trade-pay-item-price">{{p.total}}</div>
+            <ion-delete-button class="ion-minus-circled button-delete" ng-click="returnsDeletePayItem(p)">
+            </ion-delete-button>
+          </div>
+        </ion-item>
+      </ion-list>
+    </div>
+    <div class="padding trade-info trade-pay-info">
+      <div class="trade-pay-total">
+        合计：
+        <span class="trade-total" ng-bind="returnsData.total"></span>
+        元
+      </div>
+      <div>
+        已退：
+        <span class="trade-haspay" ng-bind="returnsData.hasPay"></span>
+        元
+      </div>
+      <div>
+        未退：
+        <span class="trade-nopay" ng-bind="returnsData.noPay"></span>
+        元
+      </div>
+    </div>
+    <div class="pay-mode">
+      <div ng-repeat="pm in returnsData.payMode">
+        <button class="button button-positive button-pay-mode" ng-click="returnsPayMode(pm)">{{pm.payname}}</button>
+      </div>
+    </div>
+    <div class="pay-operation">
+      <button class="button button-balanced button-endpay" ng-click="returnsEndPay()">完成退款</button>
+      <button class="button button-positive button-deletepay" ng-click="returnsDeletePay()">删除退款</button>
+      <button class="button button-positive button-clearpay" ng-click="returnsClearPay()">清空退款</button>
+    </div>
+  </ion-content>
+</ion-modal-view>

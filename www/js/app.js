@@ -77,12 +77,22 @@ angular.module('phonepos', ['ionic', 'phonepos.controllers'])
         }
       })
 
+      .state('menu.returns', {
+        url: '/returns',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/returns.html',
+            controller: 'returnsCtrl'
+          }
+        }
+      })
+
       .state('menu.dayover', {
         url: '/dayover',
         views: {
           'menuContent': {
             templateUrl: 'templates/dayover.html',
-            controller: 'dayoverCtrl'
+            controller: 'dayOverCtrl'
           }
         }
       })

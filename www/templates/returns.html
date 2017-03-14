@@ -1,0 +1,50 @@
+<ion-view view-title="退货">
+  <ion-content>
+    <div class="returns-blank" ng-show="returnsBlank"></div>
+    <div class="padding">
+      <form class="padding-bottom">
+        <label class="item item-input">
+          <!--<input type="number" ng-model="returnsData.order" placeholder="请输入订单流水号">-->
+          <input type="text" ng-model="returnsData.order" placeholder="请输入订单流水号">
+        </label>
+      </form>
+      <div class="text-right">
+        <button class="button button-positive button-returns" ng-click="returnsReturns()">退货</button>
+      </div>
+    </div>
+    <div class="returns-order" ng-show="returnsOrder">
+      <div class="padding trade-info">
+        流水号：
+        <span class="trade-number" ng-bind="returnsData.ordernum"></span>
+        <br>
+        顾客类型：
+        <span class="trade-number" ng-bind="returnsData.customer"></span>
+      </div>
+      <div class="padding trade-main">
+        <div class="padding-bottom trade-item">
+          <div class="trade-item-no">序号</div>
+          <div class="trade-item-code">商品编码</div>
+          <div class="trade-item-name">商品名称</div>
+          <div class="trade-item-price">价格</div>
+          <div class="trade-item-number">数量</div>
+          <div class="trade-item-total">总价</div>
+        </div>
+        <div class="padding-bottom trade-item" ng-repeat="commod in returnsData.commodity">
+          <div class="trade-item-no">{{commod.no}}</div>
+          <div class="trade-item-code">{{commod.code}}</div>
+          <div class="trade-item-name">{{commod.name}}</div>
+          <div class="trade-item-price">{{commod.price}}</div>
+          <div class="trade-item-number">{{commod.number}}</div>
+          <div class="trade-item-total">{{commod.total}}</div>
+        </div>
+      </div>
+      <div class="padding trade-info">
+        合计：
+        <span class="trade-total" ng-bind="returnsData.total"></span>
+        元
+      </div>
+      <div class="text-right padding-top">
+        <button class="button button-positive button-confirm" ng-click="returnsConfirm()">确认</button>
+      </div>
+    </div>
+</ion-view>

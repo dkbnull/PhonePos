@@ -24,39 +24,46 @@
             <div class="trade-pay-item-no">{{p.no}}</div>
             <div class="trade-pay-item-code">{{p.code}}</div>
             <div class="trade-pay-item-name">{{p.name}}</div>
-            <div class="trade-pay-item-price">{{p.price}}</div>
+            <div class="trade-pay-item-price">{{p.total}}</div>
             <ion-delete-button class="ion-minus-circled button-delete" ng-click="tradeDeletePayItem(p)">
             </ion-delete-button>
           </div>
         </ion-item>
       </ion-list>
     </div>
-    <div class="padding trade-info">
-      应付：
-      <span class="trade-total" ng-bind="tradeData.total"></span>
-      元
-      &nbsp;
-      已付：
-      <span class="trade-haspay" ng-bind="tradeData.hasPay"></span>
-      元
-      &nbsp;
-      <br>
-      未付：
-      <span class="trade-nopay" ng-bind="tradeData.noPay"></span>
-      元
-      &nbsp;
-      找零：
-      <span class="trade-change" ng-bind="tradeData.change"></span>
-      元
+    <div class="padding-top padding-left padding-right trade-info trade-pay-info">
+      <div class="trade-pay-total">
+        应付：
+        <span class="trade-total" ng-bind="tradeData.total"></span>
+        元
+      </div>
+      <div>
+        已付：
+        <span class="trade-haspay" ng-bind="tradeData.hasPay"></span>
+        元
+      </div>
     </div>
-    <div class="padding-bottom pay-mode">
+    <div class="padding-bottom padding-left padding-right trade-info trade-pay-info">
+      <div>
+        未付：
+        <span class="trade-nopay" ng-bind="tradeData.noPay"></span>
+        元
+      </div>
+      <div>
+        找零：
+        <span class="trade-change" ng-bind="tradeData.change"></span>
+        元
+      </div>
+    </div>
+    <div class="pay-mode">
       <div ng-repeat="pm in tradeData.payMode">
         <button class="button button-positive button-pay-mode" ng-click="tradePayMode(pm)">{{pm.payname}}</button>
       </div>
     </div>
-    <!--<div class="padding-bottom">-->
-    <!--<button class="button button-positive button-clearline" ng-click="tradeClearLine()">删除支付</button>-->
-    <!--<button class="button button-positive button-clearall" ng-click="tradeClearAll()">清空支付</button>-->
-    <!--</div>-->
+    <div class="pay-operation">
+      <button class="button button-balanced button-endpay" ng-click="tradeEndPay()">完成支付</button>
+      <button class="button button-positive button-deletepay" ng-click="tradeDeletePay()">删除支付</button>
+      <button class="button button-positive button-clearpay" ng-click="tradeClearPay()">清空订单</button>
+    </div>
   </ion-content>
 </ion-modal-view>

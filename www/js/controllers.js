@@ -7,6 +7,7 @@ var urlGetSystem = website + 'system.php';
 var urlSettingSystem = website + 'system.php';
 var urlFeedback = website + 'feedback.php';
 var urlTrade = website + 'trade.php';
+var urlReturns = website + 'returns.php';
 var username, usercode;
 
 angular.module('phonepos.controllers', [])
@@ -185,6 +186,9 @@ angular.module('phonepos.controllers', [])
 
     // 点击会员按钮
     $scope.tradeVip = function () {
+      // 设置行清删除按钮不可见
+      $scope.tradeData.clearLine = false;
+
       $scope.popupTradeData = {};
 
       if (commodity != '') {
@@ -232,26 +236,38 @@ angular.module('phonepos.controllers', [])
         return false;
       }
 
-      //生成流水号，流水号 = 当前时间(yyyyMMddHHmm) + 用户编码 + 四位随机数
-      var randNum = Math.round(Math.random() * 1000);
-      randNum = formatNumber(randNum, 4, '0', 'l');
-      $scope.tradeData.order = formatDate(new Date()) + usercode + randNum;
+      if ($scope.tradeData.order == '' || $scope.tradeData.order == null ||
+        $scope.tradeData.order == undefined) {
+        //生成流水号，流水号 = 当前时间(yyyyMMddHHmm) + 用户编码 + 四位随机数
+        var randNum = Math.round(Math.random() * 1000);
+        randNum = formatNumber(randNum, 4, '0', 'l');
+        $scope.tradeData.order = formatDate(new Date()) + usercode + randNum;
+      }
 
-      hasPay = hasPay.toFixed(2);
-      noPay = parseFloat(total).toFixed(2);
-      change = change.toFixed(2);
+      hasPay = parseFloat(hasPay).toFixed(2);
+      noPay = (parseFloat(total) - parseFloat(hasPay)).toFixed(2);
+      if (parseFloat(noPay) < 0) {
+        noPay = 0;
+        noPay = noPay.toFixed(2);
+      }
+      change = parseFloat(change).toFixed(2);
       $scope.tradeData.hasPay = hasPay;
       $scope.tradeData.noPay = noPay;
       $scope.tradeData.change = change;
 
+      // 设置删除支付按钮默认不可见
+      $scope.tradeData.deletePay = false;
       loadPayMode();
     };
 
     // 点击 trade-pay.html 关闭按钮
     $scope.closeTradePay = function () {
+      // 设置删除支付按钮不可见
+      $scope.tradeData.deletePay = false;
+
       $ionicPopup.confirm({
         title: '提示',
-        template: '确认关闭支付页面',
+        template: '该操作不删除订单信息，确认关闭支付页面',
         okText: '确定',
         cancelText: '取消'
       }).then(function (result) {
@@ -263,6 +279,9 @@ angular.module('phonepos.controllers', [])
 
     // 点击 trade-pay.html 某一支付方式按钮
     $scope.tradePayMode = function (pm) {
+      // 设置删除支付按钮不可见
+      $scope.tradeData.deletePay = false;
+
       $scope.popupTradeData = {};
 
       if ($scope.tradeData.noPay == 0) {
@@ -271,32 +290,92 @@ angular.module('phonepos.controllers', [])
           template: '当前订单已支付完成，无需再进行支付',
           okText: '确定'
         });
-      } else {
-        $ionicPopup.show({
-          title: pm['payname'],
-          template: '<input type="number" placeholder="请输入支付金额" ng-model="popupTradeData.total">',
-          scope: $scope,
-          buttons: [
-            {
-              text: "取消",
-              onTap: function () {
-                return false;
-              }
-            },
-            {
-              text: "确定",
-              type: "button-positive",
-              onTap: function () {
-                return true;
-              }
-            }
-          ]
-        }).then(function (result) {
-          if (result) {
-            payOrder(pm, $scope.popupTradeData.total);
-          }
-        });
+        return false;
       }
+      $ionicPopup.show({
+        title: pm['payname'],
+        template: '<input type="number" placeholder="请输入支付金额" ng-model="popupTradeData.total">',
+        scope: $scope,
+        buttons: [
+          {
+            text: "取消",
+            onTap: function () {
+              return false;
+            }
+          },
+          {
+            text: "确定",
+            type: "button-positive",
+            onTap: function () {
+              return true;
+            }
+          }
+        ]
+      }).then(function (result) {
+        if (result) {
+          payOrder(pm, $scope.popupTradeData.total);
+        }
+      });
+    };
+
+    // 点击删除支付按钮
+    $scope.tradeDeletePay = function () {
+      $scope.tradeData.deletePay = !$scope.tradeData.deletePay;
+    };
+
+    // 删除某一支付方式
+    $scope.tradeDeletePayItem = function (p) {
+      $ionicPopup.confirm({
+        title: '提示',
+        template: '该操作不可撤销，是否删除当前支付方式',
+        okText: '确定',
+        cancelText: '取消'
+      }).then(function (result) {
+        if (result) {
+          deleteLinePay(p);
+        }
+      });
+    };
+
+    // 点击清空订单按钮
+    $scope.tradeClearPay = function () {
+      $ionicPopup.confirm({
+        title: '提示',
+        template: '该操作不可撤销，是否清空当前订单',
+        okText: '确定',
+        cancelText: '取消'
+      }).then(function (result) {
+        if (result) {
+          initializeInfo();
+          $scope.modal.hide();
+        }
+      });
+    };
+
+    // 点击完成支付按钮
+    $scope.tradeEndPay = function () {
+      // 设置删除支付按钮不可见
+      $scope.tradeData.deletePay = false;
+
+      if ($scope.tradeData.noPay != 0) {
+        $ionicPopup.alert({
+          title: '提示',
+          template: '当前订单未支付完成，不能完成支付',
+          okText: '确定'
+        });
+        return false;
+      }
+
+      $ionicPopup.confirm({
+        title: '提示',
+        template: '是否完成支付',
+        okText: '确定',
+        cancelText: '取消'
+      }).then(function (result) {
+        if (result) {
+          orderEndPay();
+        }
+      });
     };
 
     /**
@@ -439,7 +518,7 @@ angular.module('phonepos.controllers', [])
       $scope.tradeData.commodity.splice(index, 1);
       console.log('clearLineCommodity success:', $scope.tradeData.commodity);
 
-      // 商品序号重新设置，删除某一商品后，后面商品序号一次减1
+      // 商品序号重新设置，删除某一商品后，后面商品序号依次减1
       for (var i = index; i < $scope.tradeData.commodity.length; i++) {
         $scope.tradeData.commodity[i]['no'] = parseInt($scope.tradeData.commodity[i]['no']) - 1;
         console.log('clearLineCommodity reset no success:', $scope.tradeData.commodity);
@@ -500,33 +579,6 @@ angular.module('phonepos.controllers', [])
     }
 
     /**
-     * 上传流水信息
-     */
-    function saveSaleOrder() {
-      console.log('saveSaleOrder start:', $scope.tradeData.commodity);
-      $http.post(urlTrade, {
-        data: $scope.tradeData.commodity,
-        username: username,
-        order: $scope.tradeData.order,
-        total: $scope.tradeData.total,
-        cardfaceno: cardfaceno,
-        method: 'saveSaleOrder'
-      }).success(function (response) {
-        console.log('saveSaleOrder success:', response);
-        if (response.msgcode == 1) {
-
-        }
-      }).error(function () {
-        console.log('saveSaleOrder fail:', '网络异常');
-        $ionicPopup.alert({
-          title: '提示',
-          template: '网络异常',
-          okText: '确定'
-        });
-      });
-    }
-
-    /**
      * 加载支付方式
      */
     function loadPayMode() {
@@ -540,7 +592,7 @@ angular.module('phonepos.controllers', [])
           $scope.modal.show();
         }
       }).error(function () {
-        console.log('load pay mode fail:', '网络异常');
+        console.log('loadPayMode fail:', '网络异常');
         $ionicPopup.alert({
           title: '提示',
           template: '网络异常',
@@ -578,7 +630,7 @@ angular.module('phonepos.controllers', [])
           '"no": "1",' +
           '"code": "' + pm["paycode"] + '",' +
           '"name": "' + pm["payname"] + '",' +
-          '"price": "' + total + '"' +
+          '"total": "' + total + '"' +
           '}';
       } else {
         var no = $scope.tradeData.pay.length + 1;
@@ -586,7 +638,7 @@ angular.module('phonepos.controllers', [])
           '"no": "' + no + '",' +
           '"code": "' + pm["paycode"] + '",' +
           '"name": "' + pm["payname"] + '",' +
-          '"price": "' + total + '"' +
+          '"total": "' + total + '"' +
           '}';
       }
       console.log('payOrder success pay:', pay);
@@ -597,7 +649,7 @@ angular.module('phonepos.controllers', [])
 
       hasPay = parseFloat(hasPay) + parseFloat(total);
       hasPay = parseFloat(hasPay).toFixed(2);
-      noPay = parseFloat(noPay) - total;
+      noPay = parseFloat(noPay) - parseFloat(total);
       if (noPay >= 0) {
         noPay = noPay.toFixed(2);
       } else {
@@ -611,32 +663,437 @@ angular.module('phonepos.controllers', [])
       $scope.tradeData.change = change;
     }
 
+    /**
+     * 删除某一支付方式
+     *
+     * @param p 要删除的支付方式
+     */
+    function deleteLinePay(p) {
+      console.log('deleteLinePay begin:', p);
+      var index = $scope.tradeData.pay.indexOf(p);
+      var total = $scope.tradeData.pay[index]['total'];
+      $scope.tradeData.pay.splice(index, 1);
+      console.log('deleteLinePay success:', $scope.tradeData.pay);
 
-    // console.log('payOrder start pm:', pm);
-    // console.log('payOrder start total:', total);
-    // $http.post(urlTrade, {
-    //   data: pm,
-    //   username: username,
-    //   order: $scope.tradeData.order,
-    //   total: total,
-    //   method: 'payOrder'
-    // }).success(function (response) {
-    //   console.log('payOrder success:', response);
-    //
-    // }).error(function () {
-    //   console.log('payOrder fail:', '网络异常');
-    //   $ionicPopup.alert({
-    //     title: '提示',
-    //     template: '网络异常',
-    //     okText: '确定'
-    //   });
-    // });
+      // 支付方式序号重新设置，删除某一支付方式后，后面支付方式序号依次减1
+      for (var i = index; i < $scope.tradeData.pay.length; i++) {
+        $scope.tradeData.pay[i]['no'] = parseInt($scope.tradeData.pay[i]['no']) - 1;
+        console.log('deleteLinePay reset no success:', $scope.tradeData.pay);
+      }
+
+      // 将 pay 字符串中相应支付方式删除
+      pay = JSON.stringify($scope.tradeData.pay);
+      console.log('deleteLinePay reset pay begin:', pay);
+      pay = pay.substring(pay.indexOf('[') + 1, pay.indexOf(']'));
+      console.log('deleteLinePay reset pay success:', pay);
+
+      // 将已付、未付、找零金额做相关处理，相应支付方式已支付金额
+      hasPay = parseFloat(hasPay) - parseFloat(total);
+      hasPay = parseFloat(hasPay).toFixed(2);
+      if (parseFloat(change) == 0) {
+        noPay = parseFloat(noPay) + parseFloat(total);
+        noPay = noPay.toFixed(2);
+      } else {
+        change = parseFloat(change) - total;
+        if (change < 0) {
+          noPay = -change;
+          noPay = noPay.toFixed(2);
+          change = 0;
+          change = change.toFixed(2);
+        } else {
+          change = change.toFixed(2);
+        }
+      }
+      $scope.tradeData.hasPay = hasPay;
+      $scope.tradeData.noPay = noPay;
+      $scope.tradeData.change = change;
+    }
+
+    /**
+     * 完成支付
+     */
+    function orderEndPay() {
+      saveOrder();
+    }
+
+    /**
+     * 保存流水信息
+     */
+    function saveOrder() {
+      console.log('saveOrder start:', $scope.tradeData.commodity);
+      $http.post(urlTrade, {
+        data: $scope.tradeData.commodity,
+        username: username,
+        order: $scope.tradeData.order,
+        total: $scope.tradeData.total,
+        cardfaceno: cardfaceno,
+        method: 'saveOrder'
+      }).success(function (response) {
+        console.log('saveOrder success:', response);
+        if (response.msgcode == 1) {
+          savePay();
+        }
+      }).error(function () {
+        console.log('saveOrder fail:', '网络异常');
+        $ionicPopup.alert({
+          title: '提示',
+          template: '网络异常',
+          okText: '确定'
+        });
+      });
+    }
+
+    /**
+     * 保存支付信息
+     */
+    function savePay() {
+      console.log('savePay start:', $scope.tradeData.pay);
+      $http.post(urlTrade, {
+        data: $scope.tradeData.pay,
+        username: username,
+        order: $scope.tradeData.order,
+        haspay: $scope.tradeData.hasPay,
+        change: $scope.tradeData.change,
+        method: 'savePay'
+      }).success(function (response) {
+        console.log('savePay success:', response);
+        if (response.msgcode == 1) {
+          initializeInfo();
+          $scope.modal.hide();
+        }
+      }).error(function () {
+        console.log('savePay fail:', '网络异常');
+        $ionicPopup.alert({
+          title: '提示',
+          template: '网络异常',
+          okText: '确定'
+        });
+      });
+    }
+
+    /**
+     * 初始化相关数据
+     */
+    function initializeInfo() {
+      $scope.tradeData.clearLine = false;
+      $scope.tradeData.deletePay = false;
+
+      plucode = '';
+      $scope.tradeData.plucode = '';
+
+      commodity = '';
+      $scope.tradeData.commodity = '';
+      pay = '';
+      $scope.tradeData.pay = '';
+
+      $scope.tradeData.order = '';
+
+      cardfaceno = '';
+      isvip = 0;
+      $scope.tradeData.customer = '普通';
+
+      total = 0;
+      hasPay = 0;
+      noPay = 0;
+      change = 0;
+      total = total.toFixed(2);
+      hasPay = hasPay.toFixed(2);
+      noPay = noPay.toFixed(2);
+      change = change.toFixed(2);
+      $scope.tradeData.total = total;
+      $scope.tradeData.hasPay = hasPay;
+      $scope.tradeData.noPay = noPay;
+      $scope.tradeData.change = change;
+    }
+  })
+
+  /**
+   * returns.html
+   */
+  .controller('returnsCtrl', function ($scope, $http, $ionicModal, $ionicPopup) {
+    $scope.returnsData = {};
+
+    $ionicModal.fromTemplateUrl('templates/returns-pay.html', {
+      scope: $scope,
+      animation: "slide-in-up"
+    }).then(function (modal) {
+      $scope.modal = modal;
+    });
+
+    $scope.returnsBlank = true;
+    $scope.returnsOrder = false;
+
+    // TODO 测试
+    username = 'test';
+    usercode = '1234';
+
+    // 订单流水号
+    var order;
+    // 订单合计
+    var total = 0;
+    // 已退，未退
+    var hasPay = 0, noPay = 0;
+    // 已使用的退款方式
+    var pay = '';
+
+    // 点击退货按钮
+    $scope.returnsReturns = function () {
+      if ($scope.returnsData.order == '' || $scope.returnsData.order == null ||
+        $scope.returnsData.order == undefined) {
+        $ionicPopup.alert({
+          title: '提示',
+          template: '订单流水号不能为空',
+          okText: '确定'
+        });
+        return false;
+      }
+
+      order = $scope.returnsData.order;
+
+      var date = new Date();
+      date.setDate(date.getDate() - 7);
+      date = formatDate(date);
+      if (order.substring(0, 8) < date.substring(0, 8)) {
+        $ionicPopup.alert({
+          title: '提示',
+          template: '超出退货期限',
+          okText: '确定'
+        });
+        return false;
+      }
+
+      console.log('select order start:', $scope.returnsData.order);
+      $http.post(urlReturns, {
+        data: order.toString(),
+        username: username,
+        method: 'selectOrder'
+      }).success(function (response) {
+        console.log('select order success:', response);
+        afterSelectOrder(response);
+      }).error(function () {
+        console.log('select order fail:', '网络异常');
+        $ionicPopup.alert({
+          title: '提示',
+          template: '网络异常',
+          okText: '确定'
+        });
+      });
+    };
+
+    // 点击确认按钮
+    $scope.returnsConfirm = function () {
+      hasPay = parseFloat(hasPay).toFixed(2);
+      noPay = (parseFloat(total) - parseFloat(hasPay)).toFixed(2);
+      if (parseFloat(noPay) < 0) {
+        noPay = 0;
+        noPay = noPay.toFixed(2);
+      }
+      $scope.returnsData.hasPay = hasPay;
+      $scope.returnsData.noPay = noPay;
+
+      $scope.returnsData.deletePay = false;
+      loadPayMode();
+    };
+
+
+
+
+
+
+
+    // 点击 trade-pay.html 关闭按钮
+    $scope.closeTradePay = function () {
+      // 设置删除支付按钮不可见
+      $scope.tradeData.deletePay = false;
+
+      $ionicPopup.confirm({
+        title: '提示',
+        template: '该操作不删除订单信息，确认关闭支付页面',
+        okText: '确定',
+        cancelText: '取消'
+      }).then(function (result) {
+        if (result) {
+          $scope.modal.hide();
+        }
+      });
+    };
+
+    // 点击 trade-pay.html 某一支付方式按钮
+    $scope.tradePayMode = function (pm) {
+      // 设置删除支付按钮不可见
+      $scope.tradeData.deletePay = false;
+
+      $scope.popupTradeData = {};
+
+      if ($scope.tradeData.noPay == 0) {
+        $ionicPopup.alert({
+          title: '提示',
+          template: '当前订单已支付完成，无需再进行支付',
+          okText: '确定'
+        });
+        return false;
+      }
+      $ionicPopup.show({
+        title: pm['payname'],
+        template: '<input type="number" placeholder="请输入支付金额" ng-model="popupTradeData.total">',
+        scope: $scope,
+        buttons: [
+          {
+            text: "取消",
+            onTap: function () {
+              return false;
+            }
+          },
+          {
+            text: "确定",
+            type: "button-positive",
+            onTap: function () {
+              return true;
+            }
+          }
+        ]
+      }).then(function (result) {
+        if (result) {
+          payOrder(pm, $scope.popupTradeData.total);
+        }
+      });
+    };
+
+    // 点击删除支付按钮
+    $scope.tradeDeletePay = function () {
+      $scope.tradeData.deletePay = !$scope.tradeData.deletePay;
+    };
+
+    // 删除某一支付方式
+    $scope.tradeDeletePayItem = function (p) {
+      $ionicPopup.confirm({
+        title: '提示',
+        template: '该操作不可撤销，是否删除当前支付方式',
+        okText: '确定',
+        cancelText: '取消'
+      }).then(function (result) {
+        if (result) {
+          deleteLinePay(p);
+        }
+      });
+    };
+
+    // 点击清空订单按钮
+    $scope.tradeClearPay = function () {
+      $ionicPopup.confirm({
+        title: '提示',
+        template: '该操作不可撤销，是否清空当前订单',
+        okText: '确定',
+        cancelText: '取消'
+      }).then(function (result) {
+        if (result) {
+          initializeInfo();
+          $scope.modal.hide();
+        }
+      });
+    };
+
+    // 点击完成支付按钮
+    $scope.tradeEndPay = function () {
+      // 设置删除支付按钮不可见
+      $scope.tradeData.deletePay = false;
+
+      if ($scope.tradeData.noPay != 0) {
+        $ionicPopup.alert({
+          title: '提示',
+          template: '当前订单未支付完成，不能完成支付',
+          okText: '确定'
+        });
+        return false;
+      }
+
+      $ionicPopup.confirm({
+        title: '提示',
+        template: '是否完成支付',
+        okText: '确定',
+        cancelText: '取消'
+      }).then(function (result) {
+        if (result) {
+          orderEndPay();
+        }
+      });
+    };
+
+
+
+
+
+
+
+
+
+
+    /**
+     * 查询订单成功后相关操作
+     *
+     * @param response 查询订单成功后返回信息
+     */
+    function afterSelectOrder(response) {
+      var commodityinfo, payinfo, total, cardfaceno;
+
+      if (response.msgcode == 1) {
+        commodityinfo = response.msgmain.commodityinfo.data;
+        payinfo = response.msgmain.payinfo.data;
+        total = response.msgmain.commodityinfo.total;
+        cardfaceno = response.msgmain.commodityinfo.cardfaceno;
+        console.log('afterSelectOrder read info success commodityinfo:', commodityinfo);
+        console.log('afterSelectOrder read info success payinfo:', payinfo);
+        console.log('afterSelectOrder read info success total:', total);
+        console.log('afterSelectOrder read info success cardfaceno:', cardfaceno);
+
+        $scope.returnsData.ordernum = order;
+        if (cardfaceno == '') {
+          $scope.returnsData.customer = '普通';
+        } else {
+          $scope.returnsData.customer = '会员';
+        }
+        $scope.returnsData.commodity = commodityinfo;
+        $scope.returnsData.total = total;
+
+        $scope.returnsBlank = false;
+        $scope.returnsOrder = true;
+      } else {
+        $ionicPopup.alert({
+          title: '提示',
+          template: '该订单不存在',
+          okText: '确定'
+        });
+      }
+    }
+
+    /**
+     * 加载退款支付方式
+     */
+    function loadPayMode() {
+      console.log('loadPayMode start');
+      $http.post(urlTrade, {
+        method: 'loadPayMode'
+      }).success(function (response) {
+        console.log('loadPayMode success:', response);
+        if (response.msgcode == 1) {
+          $scope.returnsData.payMode = response.msgmain;
+          $scope.modal.show();
+        }
+      }).error(function () {
+        console.log('loadPayMode fail:', '网络异常');
+        $ionicPopup.alert({
+          title: '提示',
+          template: '网络异常',
+          okText: '确定'
+        });
+      });
+    }
   })
 
   /**
    * dayover.html
    */
-  .controller('dayoverCtrl', function ($scope, $http) {
+  .controller('dayOverCtrl', function ($scope, $http) {
     //TODO
   })
 

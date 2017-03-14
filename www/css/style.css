@@ -108,10 +108,61 @@ trade-*.html
   margin-top: -10px;
 }
 
+.pay-mode {
+  width: 70%;
+  float: left;
+  background-color: #eee;
+}
+
+.trade-pay-info {
+  display: flex;
+}
+
+.trade-pay-info .trade-pay-total,
+.trade-pay-info .trade-pay-haspay,
+.trade-pay-info .trade-pay-nopay,
+.trade-pay-info .trade-pay-change {
+  flex: 1;
+}
+
 .button-pay-mode {
   width: 32%;
   float: left;
   margin: 0.66%;
+}
+
+.pay-operation {
+  width: 30%;
+  float: right;
+}
+
+.button-endpay,
+.button-deletepay,
+.button-clearpay {
+  width: 98%;
+  margin: 1%;
+}
+
+/**
+returns.html
+returns-*.html
+ */
+.returns-blank {
+  height: 30%;
+}
+
+.button-returns {
+  width: 50%;
+}
+
+.returns-order {
+  width: 100%;
+  height: 50%;
+}
+
+.returns-order .trade-main {
+  height: 100%;
+  overflow: scroll;
 }
 
 /**
