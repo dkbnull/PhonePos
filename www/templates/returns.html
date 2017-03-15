@@ -4,8 +4,8 @@
     <div class="padding">
       <form class="padding-bottom">
         <label class="item item-input">
-          <!--<input type="number" ng-model="returnsData.order" placeholder="请输入订单流水号">-->
-          <input type="text" ng-model="returnsData.order" placeholder="请输入订单流水号">
+          <!--<input type="number" ng-model="returnsData.ordernum" placeholder="请输入订单流水号">-->
+          <input type="text" ng-model="returnsData.ordernum" placeholder="请输入订单流水号">
         </label>
       </form>
       <div class="text-right">
@@ -15,7 +15,7 @@
     <div class="returns-order" ng-show="returnsOrder">
       <div class="padding trade-info">
         流水号：
-        <span class="trade-number" ng-bind="returnsData.ordernum"></span>
+        <span class="trade-number" ng-bind="returnsData.order"></span>
         <br>
         顾客类型：
         <span class="trade-number" ng-bind="returnsData.customer"></span>
