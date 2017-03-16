@@ -1,0 +1,85 @@
+<ion-view view-title="查询">
+  <ion-content>
+    <div class="query-blank" ng-show="queryBlank"></div>
+    <div class="text-center padding-top padding-bottom">
+      <button class="button button-positive button-query" ng-click="queryOrder()">订单查询</button>
+      <button class="button button-positive button-query" ng-click="queryCommodity()">商品查询</button>
+    </div>
+    <div class="text-center padding-top padding-bottom" ng-show="queryCommodityButton">
+      <button class="button button-positive button-commodity" ng-click="queryCommodityAll()">所有</button>
+      <button class="button button-positive button-commodity" ng-click="queryCommodityCode()">按编码</button>
+      <button class="button button-positive button-commodity" ng-click="queryCommodityName()">按名称</button>
+    </div>
+    <div class="padding" ng-show="queryInput">
+      <form>
+        <label class="item item-input">
+          <input type="text" ng-model="queryData.input" placeholder="请输入相关关键字">
+        </label>
+        <div class="text-right padding-top">
+          <button class="button button-positive button-query" ng-click="queryConfirm()">确认</button>
+        </div>
+      </form>
+    </div>
+    <div class="query-order" ng-show="querySale">
+      <div class="padding trade-info">
+        流水号：
+        <span class="trade-number" ng-bind="queryData.order"></span>
+        <br>
+        顾客类型：
+        <span class="trade-number" ng-bind="queryData.customer"></span>
+      </div>
+      <div class="padding trade-main">
+        <div class="padding-bottom trade-item">
+          <div class="trade-item-no">序号</div>
+          <div class="trade-item-code">商品编码</div>
+          <div class="trade-item-name">商品名称</div>
+          <div class="trade-item-price">价格</div>
+          <div class="trade-item-number">数量</div>
+          <div class="trade-item-total">总价</div>
+        </div>
+        <div class="padding-bottom trade-item" ng-repeat="commod in queryData.commodity">
+          <div class="trade-item-no">{{commod.no}}</div>
+          <div class="trade-item-code">{{commod.code}}</div>
+          <div class="trade-item-name">{{commod.name}}</div>
+          <div class="trade-item-price">{{commod.price}}</div>
+          <div class="trade-item-number">{{commod.number}}</div>
+          <div class="trade-item-total">{{commod.total}}</div>
+        </div>
+      </div>
+      <div class="padding trade-info">
+        合计：
+        <span class="trade-total" ng-bind="queryData.total"></span>
+        元
+      </div>
+    </div>
+    <div class="query-commodity" ng-show="queryCommoditys">
+      <div class="padding commodity-main">
+        <div class="padding-bottom commodity-item">
+          <div class="commodity-code">商品编码</div>
+          <div class="commodity-name">商品名称</div>
+          <div class="commodity-price">商品价格</div>
+          <div class="commodity-vipprice">会员价格</div>
+        </div>
+        <div class="padding-bottom commodity-item">
+          <div class="commodity-code"></div>
+          <div class="commodity-inventory">是否有库存</div>
+          <div class="commodity-present">是否为赠品</div>
+          <div class="commodity-remark">备注</div>
+        </div>
+        <div ng-repeat="commods in queryData.commoditys">
+          <div class="padding-bottom commodity-item">
+            <div class="commodity-code">{{commods.code}}</div>
+            <div class="commodity-name">{{commods.name}}</div>
+            <div class="commodity-price">{{commods.price}}</div>
+            <div class="commodity-vipprice">{{commods.vipprice}}</div>
+          </div>
+          <div class="padding-bottom commodity-item">
+            <div class="commodity-code"></div>
+            <div class="commodity-inventory">{{commod.inventory}}</div>
+            <div class="commodity-present">{{commod.present}}</div>
+            <div class="commodity-remark">{{commod.remark}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+</ion-view>

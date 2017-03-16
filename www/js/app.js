@@ -77,6 +77,16 @@ angular.module('phonepos', ['ionic', 'phonepos.controllers'])
         }
       })
 
+      .state('menu.query', {
+        url: '/query',
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/query.html',
+            controller: 'queryCtrl'
+          }
+        }
+      })
+
       .state('menu.returns', {
         url: '/returns',
         views: {

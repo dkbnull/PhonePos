@@ -166,6 +166,48 @@ returns-*.html
 }
 
 /**
+query.html
+ */
+.query-blank {
+  height: 30%;
+}
+
+.button-query {
+  width: 47%;
+}
+
+.button-commodity {
+  width: 31%;
+}
+
+.query-order {
+  width: 100%;
+  height: 50%;
+}
+
+.query-order .trade-main {
+  height: 100%;
+  overflow: scroll;
+}
+
+.commodity-item {
+  display: flex;
+}
+
+.commodity-code,
+.commodity-name {
+  flex: 3;
+}
+
+.commodity-price,
+.commodity-vipprice,
+.commodity-inventory,
+.commodity-present,
+.commodity-remark {
+  flex: 2;
+}
+
+/**
 setting-*.html
  */
 input::-webkit-outer-spin-button,
