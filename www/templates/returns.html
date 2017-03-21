@@ -13,15 +13,15 @@
       </div>
     </div>
     <div class="returns-order" ng-show="returnsOrder">
-      <div class="padding trade-info">
+      <div class="trade-info">
         流水号：
         <span class="trade-number" ng-bind="returnsData.order"></span>
         <br>
         顾客类型：
         <span class="trade-number" ng-bind="returnsData.customer"></span>
       </div>
-      <div class="padding trade-main">
-        <div class="padding-bottom trade-item">
+      <div class="trade-main">
+        <div class="padding-bottom trade-item trade-title">
           <div class="trade-item-no">序号</div>
           <div class="trade-item-code">商品编码</div>
           <div class="trade-item-name">商品名称</div>
@@ -38,7 +38,7 @@
           <div class="trade-item-total">{{commod.total}}</div>
         </div>
       </div>
-      <div class="padding trade-info">
+      <div class="trade-info">
         合计：
         <span class="trade-total" ng-bind="returnsData.total"></span>
         元

@@ -1,17 +1,82 @@
 /**
+login.html
+ */
+.login-img {
+  text-align: center;
+}
+
+.login-img img {
+  height: 30%;
+  width: 30%;
+}
+
+/**
+menu.html
+ */
+.menu.menu-left * {
+  font-weight: bold;
+}
+
+.expanded-header {
+  height: 25%;
+  background-image: url("../img/menu/background.jpg");
+  background-size: 120%;
+  background-position: 0;
+  transition: all .5s ease-in-out;
+}
+
+.expanded-header img {
+  margin-left: 5%;
+  margin-top: 5%;
+  height: 50%;
+  background: none;
+}
+
+.expanded-bottom {
+  margin-top: 45%;
+  margin-left: -30%;
+  height: 10%;
+  font-size: 1.5em;
+  color: #fff;
+  background: none;
+}
+
+.menu-left-main {
+  margin-top: 40%;
+}
+
+.menu-open .ion-navicon {
+  transform: rotate(-360deg);
+  -webkit-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+.menu-open .ion-navicon:before {
+  content: "\f2ca";
+}
+
+/**
 trade.html
 trade-*.html
  */
 .trade-info {
   width: 100%;
   color: #fff;
-  background-color: #4b8bf4;
+  background-color: #387ef5;
+  padding: 12px;
+  font-size: 1.2em;
 }
 
 .trade-main {
   width: 100%;
   height: 50%;
+  padding: 8px;
   overflow: scroll;
+}
+
+.trade-main .trade-title {
+  font-size: 1.1em;
+  color: #ff3b30;
 }
 
 .trade-list-item {
@@ -55,6 +120,10 @@ trade-*.html
 .trade-list-item .button-delete:after {
   font-size: 24px;
   padding: 0;
+}
+
+.button-group {
+  margin-bottom: 40px;
 }
 
 .trade-total,
@@ -116,6 +185,7 @@ trade-*.html
 
 .trade-pay-info {
   display: flex;
+
 }
 
 .trade-pay-info .trade-pay-total,
@@ -123,6 +193,14 @@ trade-*.html
 .trade-pay-info .trade-pay-nopay,
 .trade-pay-info .trade-pay-change {
   flex: 1;
+}
+
+.trade-pay-info-1 {
+  padding-bottom: 4px;
+}
+
+.trade-pay-info-2 {
+  padding-top: 4px;
 }
 
 .button-pay-mode {
@@ -191,7 +269,7 @@ query.html
 }
 
 .query-commodity {
-  height: 70%;
+  height: 55%;
   overflow: scroll;
 }
 
@@ -222,7 +300,9 @@ dayover.html
 .dayover-info {
   width: 100%;
   color: #fff;
-  background-color: #4b8bf4;
+  background-color: #387ef5;
+  padding: 12px;
+  font-size: 1.2em;
 }
 
 .dayover-main {

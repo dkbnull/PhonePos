@@ -46,6 +46,8 @@ angular.module('query.controller', ['query.service'])
     $scope.queryCommodityAll = function () {
       method = 'queryCommodityAll';
 
+      $scope.queryInput = false;
+
       console.log(method + ' start');
       $http.post(urlQuery, {
         username: username,

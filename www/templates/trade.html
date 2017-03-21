@@ -1,11 +1,11 @@
 <ion-view view-title="销售">
   <ion-content>
-    <div class="padding trade-info">
+    <div class="trade-info">
       顾客类型：
       <span class="trade-number" ng-bind="tradeData.customer"></span>
     </div>
-    <div class="padding trade-main">
-      <div class="padding-bottom trade-item">
+    <div class="trade-main">
+      <div class="padding-bottom trade-item trade-title">
         <div class="trade-item-no">序号</div>
         <div class="trade-item-code">商品编码</div>
         <div class="trade-item-name">商品名称</div>
@@ -28,7 +28,7 @@
         </ion-item>
       </ion-list>
     </div>
-    <div class="padding trade-info">
+    <div class="trade-info">
       合计：
       <span class="trade-total" ng-bind="tradeData.total"></span>
       元
@@ -38,11 +38,11 @@
         <input type="number" ng-model="tradeData.plucode" placeholder="请输入商品编码">
       </label>
     </form>
-    <div class="padding-bottom">
+    <div class="button-group padding-bottom">
       <button class="button button-positive button-total" ng-click="tradeTotal()">合计</button>
       <button class="button button-balanced button-confirm" ng-click="tradeConfirm()">确认</button>
     </div>
-    <div class="padding-bottom">
+    <div class="">
       <button class="button button-positive button-vip" ng-click="tradeVip()">会员</button>
       <button class="button button-positive button-clearline" ng-click="tradeClearLine()">行清</button>
       <button class="button button-positive button-clearall" ng-click="tradeClearAll()">总清</button>

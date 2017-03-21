@@ -13,6 +13,7 @@ angular.module('dayover.controller', ['dayover.service'])
     $scope.dayoverData.date = date.substring(0, 4) + '-'
       + date.substring(4, 6) + '-'
       + date.substring(6, 8);
+    $scope.dayoverData.total = '0.00';
 
     console.log('load dayover start', date);
     $http.post(urlDayover, {

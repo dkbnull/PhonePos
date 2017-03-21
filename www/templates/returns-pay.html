@@ -4,15 +4,15 @@
     <a class="button" ng-click="closeReturnsPay()">关闭</a>
   </ion-header-bar>
   <ion-content>
-    <div class="padding trade-info">
+    <div class="trade-info">
       流水号：
       <span class="trade-number" ng-bind="returnsData.order"></span>
       <br>
       顾客类型：
       <span class="trade-number" ng-bind="returnsData.customer"></span>
     </div>
-    <div class="padding trade-main">
-      <div class="padding-bottom trade-item">
+    <div class="trade-main">
+      <div class="padding-bottom trade-item trade-title">
         <div class="trade-pay-item-no">序号</div>
         <div class="trade-pay-item-code">退款编码</div>
         <div class="trade-pay-item-name">退款名称</div>
@@ -31,18 +31,20 @@
         </ion-item>
       </ion-list>
     </div>
-    <div class="padding trade-info trade-pay-info">
+    <div class="trade-info trade-pay-info trade-pay-info-1">
       <div class="trade-pay-total">
         合计：
         <span class="trade-total" ng-bind="returnsData.total"></span>
         元
       </div>
-      <div>
+    </div>
+    <div class="trade-info trade-pay-info trade-pay-info-2">
+      <div class="trade-pay-haspay">
         已退：
         <span class="trade-haspay" ng-bind="returnsData.hasPay"></span>
         元
       </div>
-      <div>
+      <div class="trade-pay-nopay">
         未退：
         <span class="trade-nopay" ng-bind="returnsData.noPay"></span>
         元
