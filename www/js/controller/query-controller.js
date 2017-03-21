@@ -8,15 +8,25 @@ angular.module('query.controller', ['query.service'])
     $scope.querySale = false;
     $scope.queryCommoditys = false;
 
+    // TODO 测试
+    username = 'test';
+    usercode = '1234';
+
     // 调用的方法
     var method = '';
+    // 关键字
+    var input = '';
 
     // 点击订单查询按钮
     $scope.queryOrder = function () {
       method = 'queryOrder';
 
       $scope.queryInput = true;
+      $scope.queryData.input = '';
 
+      if ($scope.queryCommoditys) {
+        $scope.queryBlank = true;
+      }
       $scope.queryCommodityButton = false;
       $scope.queryCommoditys = false;
     };
@@ -25,6 +35,9 @@ angular.module('query.controller', ['query.service'])
     $scope.queryCommodity = function () {
       $scope.queryCommodityButton = true;
 
+      if ($scope.querySale) {
+        $scope.queryBlank = true;
+      }
       $scope.queryInput = false;
       $scope.querySale = false;
     };
@@ -33,7 +46,21 @@ angular.module('query.controller', ['query.service'])
     $scope.queryCommodityAll = function () {
       method = 'queryCommodityAll';
 
-      $scope.queryInput = true;
+      console.log(method + ' start');
+      $http.post(urlQuery, {
+        username: username,
+        method: method
+      }).success(function (response) {
+        console.log(method + ' success:', response);
+        afterQuery(response);
+      }).error(function () {
+        console.log(method + ' fail:', '网络异常');
+        $ionicPopup.alert({
+          title: '提示',
+          template: '网络异常',
+          okText: '确定'
+        });
+      });
     };
 
     // 点击按编码按钮
@@ -41,6 +68,7 @@ angular.module('query.controller', ['query.service'])
       method = 'queryCommodityCode';
 
       $scope.queryInput = true;
+      $scope.queryData.input = '';
     };
 
     // 点击按名称按钮
@@ -48,6 +76,7 @@ angular.module('query.controller', ['query.service'])
       method = 'queryCommodityName';
 
       $scope.queryInput = true;
+      $scope.queryData.input = '';
     };
 
     // 点击确认按钮
@@ -62,7 +91,7 @@ angular.module('query.controller', ['query.service'])
         return false;
       }
 
-      var input = $scope.queryData.input;
+      input = $scope.queryData.input;
 
       console.log(method + ' start:', $scope.queryData.input);
       $http.post(urlQuery, {
@@ -88,13 +117,27 @@ angular.module('query.controller', ['query.service'])
      * @param response 查询成功后返回信息
      */
     function afterQuery(response) {
+      if (method == 'queryOrder') {
+        afterQueryOrder(response);
+      } else {
+        afterCommodity(response);
+      }
+    }
+
+    /**
+     * 查询订单成功后相关操作
+     *
+     * @param response 查询成功后返回信息
+     */
+    function afterQueryOrder(response) {
       var commodityinfo, total, cardfaceno;
 
       if (response.msgcode == 1) {
-        if (response.msgmain.username != '') {
+        if (!(response.msgmain.username == '' || response.msgmain.username == null ||
+          response.msgmain.username == undefined)) {
           $ionicPopup.alert({
             title: '提示',
-            template: '该订单已经退款，不再提供查询',
+            template: '该订单已经退款，不能对其查询',
             okText: '确定'
           });
           return false;
@@ -107,32 +150,50 @@ angular.module('query.controller', ['query.service'])
         console.log('afterQuery read info success total:', total);
         console.log('afterQuery read info success cardfaceno:', cardfaceno);
 
-        $scope.returnsData.order = order;
-        if (cardfaceno == '') {
-          $scope.returnsData.customer = '普通';
+        $scope.queryData.order = input;
+        if (cardfaceno == '' || cardfaceno == undefined || cardfaceno == null) {
+          $scope.queryData.customer = '普通';
         } else {
-          $scope.returnsData.customer = '会员';
+          $scope.queryData.customer = '会员';
         }
-        $scope.returnsData.commodity = commodityinfo;
-        $scope.returnsData.total = total;
+        $scope.queryData.commodity = commodityinfo;
+        $scope.queryData.total = total;
 
-        $scope.returnsBlank = false;
-        $scope.returnsOrder = true;
+        $scope.queryBlank = false;
+        $scope.querySale = true;
       } else {
         $ionicPopup.alert({
           title: '提示',
           template: '该订单不存在',
           okText: '确定'
         });
+
+        $scope.queryData.order = '';
+        $scope.queryData.customer = '';
+        $scope.queryData.commodity = '';
+        $scope.queryData.total = '';
       }
+    }
 
+    /**
+     * 查询商品成功后相关操作
+     *
+     * @param response 查询成功后返回信息
+     */
+    function afterCommodity(response) {
+      if (response.msgcode == 1) {
+        $scope.queryData.commoditys = response.msgmain;
 
-      if (method == 'queryOrder') {
-        $scope.queryBlank = false;
-        $scope.querySale = true;
-      } else {
         $scope.queryBlank = false;
         $scope.queryCommoditys = true;
+      } else {
+        $ionicPopup.alert({
+          title: '提示',
+          template: '没有正在销售的商品',
+          okText: '确定'
+        });
+
+        $scope.queryData.commoditys = '';
       }
     }
   });

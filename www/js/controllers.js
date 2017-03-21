@@ -1,5 +1,5 @@
-// var website = 'http://localhost/PhonePos/';
-var website = 'http://123.206.23.41/PhonePos/';
+var website = 'http://localhost/PhonePos/';
+// var website = 'http://123.206.23.41/PhonePos/';
 var urlLogin = website + 'user.php';
 var urlGetPerson = website + 'user.php';
 var urlSettingPerson = website + 'user.php';
@@ -9,4 +9,5 @@ var urlFeedback = website + 'feedback.php';
 var urlTrade = website + 'trade.php';
 var urlQuery = website + 'query.php';
 var urlReturns = website + 'returns.php';
+var urlDayover = website + 'dayover.php';
 var username, usercode;

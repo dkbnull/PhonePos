@@ -1,5 +1,33 @@
-<ion-view view-title="日结">
+<ion-view class="dayover" view-title="日结">
   <ion-content>
-    <h1>日结</h1>
+    <div class="padding dayover-info">
+      日期：
+      <span class="dayover-date" ng-bind="dayoverData.date"></span>
+    </div>
+    <div class="padding dayover-main">
+      <div class="padding-bottom dayover-item">
+        <div class="dayover-item-pay">支付方式</div>
+        <div class="dayover-item-total">支付金额</div>
+      </div>
+      <div class="padding-bottom dayover-item" ng-repeat="commod in dayoverData.dayover">
+        <div class="dayover-item-pay">{{commod.payname}}</div>
+        <div class="dayover-item-total">{{commod.paytotal}}</div>
+      </div>
+    </div>
+    <div class="padding dayover-info dayover-total">
+      合计：
+      <span ng-bind="dayoverData.total"></span>
+      元
+    </div>
+    <!--<div class="padding dayover-info">-->
+    <!--销售：-->
+    <!--<span ng-bind="dayoverData.trade"></span>-->
+    <!--<br>-->
+    <!--退款：-->
+    <!--<span ng-bind="dayoverData.returns"></span>-->
+    <!--</div>-->
+    <div class="padding">
+      <button class="button button-positive button-dayover" ng-click="dayoverConfirm()">日结</button>
+    </div>
   </ion-content>
 </ion-view>

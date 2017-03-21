@@ -190,6 +190,11 @@ query.html
   overflow: scroll;
 }
 
+.query-commodity {
+  height: 70%;
+  overflow: scroll;
+}
+
 .commodity-item {
   display: flex;
 }
@@ -205,6 +210,43 @@ query.html
 .commodity-present,
 .commodity-remark {
   flex: 2;
+}
+
+/**
+dayover.html
+ */
+.dayover {
+  font-size: 1.2em;
+}
+
+.dayover-info {
+  width: 100%;
+  color: #fff;
+  background-color: #4b8bf4;
+}
+
+.dayover-main {
+  width: 100%;
+  height: 70%;
+  overflow: scroll;
+}
+
+.dayover-item {
+  display: flex;
+}
+
+.dayover-item-pay,
+.dayover-item-total {
+  flex: 1;
+}
+
+.dayover-total {
+  font-size: 1.2em;
+}
+
+.button-dayover {
+  width: 50%;
+  float: right;
 }
 
 /**

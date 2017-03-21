@@ -44,7 +44,7 @@ angular.module('menu.route', ['menu.controller'])
         views: {
           'menuContent': {
             templateUrl: 'templates/dayover.html',
-            controller: 'dayOverCtrl'
+            controller: 'dayoverCtrl'
           }
         }
       })
