@@ -25,6 +25,7 @@ angular.module('login.controller', ['login.service'])
           localStorage.setItem('username', $scope.loginData.username);
           localStorage.setItem('password', $scope.loginData.password);
           localStorage.setItem('usercode', response.msgmain.usercode);
+          localStorage.setItem('name', response.msgmain.name);
           $state.go('menu.trade');
           // location.href = '#/menu/trade';
         } else {

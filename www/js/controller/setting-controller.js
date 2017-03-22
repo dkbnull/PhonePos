@@ -78,6 +78,9 @@ angular.module('setting.controller', ['setting.service'])
         if (response.msgcode == 1) {
           $scope.settingPersonBtnConfirm = false;
           $scope.settingPersonBtnModify = true;
+
+          localStorage.setItem('name', $scope.settingPersonData.name);
+
           $ionicPopup.alert({
             title: '提示',
             template: '修改成功',

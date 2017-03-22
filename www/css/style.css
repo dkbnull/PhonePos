@@ -14,7 +14,7 @@ login.html
 menu.html
  */
 .menu.menu-left * {
-  font-weight: bold;
+  /*font-weight: bold;*/
 }
 
 .expanded-header {
@@ -33,16 +33,22 @@ menu.html
 }
 
 .expanded-bottom {
+  /*font-weight: bold;*/
   margin-top: 45%;
   margin-left: -30%;
   height: 10%;
-  font-size: 1.5em;
+  width: 100%;
+  font-size: 1.3em;
   color: #fff;
   background: none;
 }
 
 .menu-left-main {
   margin-top: 40%;
+}
+
+.menu-left-main .item .item-content {
+  font-size: 1.1em;
 }
 
 .menu-open .ion-navicon {
@@ -53,6 +59,18 @@ menu.html
 
 .menu-open .ion-navicon:before {
   content: "\f2ca";
+}
+
+.menu-item {
+  margin-top: 85%;
+  display: flex;
+  padding: 0 10%;
+  font-size: 1.3em;
+}
+
+.menu-item-setting,
+.menu-item-logout {
+  flex: 1;
 }
 
 /**
