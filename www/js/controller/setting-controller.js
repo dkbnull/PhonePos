@@ -14,17 +14,14 @@ angular.module('setting.controller', ['setting.service'])
     $scope.settingPersonBtnConfirm = false;
     $scope.settingPersonBtnModify = true;
 
-    // TODO 测试
-    username = 'test';
-
-    console.log('getPerson begin:', username);
+    console.log('getPerson begin:', localStorage.getItem('username'));
     $http.post(urlGetPerson, {
-      username: username,
+      username: localStorage.getItem('username'),
       method: 'getPerson'
     }).success(function (response) {
       console.log('getPerson success:', response);
       if (response.msgcode == 1) {
-        $scope.settingPersonData.username = username;
+        $scope.settingPersonData.username = localStorage.getItem('username');
         $scope.settingPersonData.usercode = response.msgmain.usercode;
         $scope.settingPersonData.name = response.msgmain.name;
         $scope.settingPersonData.phone = parseInt(response.msgmain.phone);
@@ -113,12 +110,9 @@ angular.module('setting.controller', ['setting.service'])
     // 系统设置是否为空
     var systemSetIsNull = false;
 
-    // TODO 测试
-    username = 'test';
-
-    console.log('getSystem begin:', username);
+    console.log('getSystem begin:', localStorage.getItem('username'));
     $http.post(urlGetSystem, {
-      username: username,
+      username: localStorage.getItem('username'),
       method: 'getSystem'
     }).success(function (response) {
       console.log('getSystem success:', response);
@@ -174,7 +168,7 @@ angular.module('setting.controller', ['setting.service'])
       console.log('settingSystem start:', $scope.settingSystemData);
       $http.post(urlSettingSystem, {
         data: $scope.settingSystemData,
-        username: username,
+        username: localStorage.getItem('username'),
         systemNull: systemSetIsNull,
         method: 'settingSystem'
       }).success(function (response) {
@@ -212,9 +206,6 @@ angular.module('setting.controller', ['setting.service'])
   .controller('settingAppFeedbackCtrl', function ($scope, $http, $ionicPopup) {
     $scope.feedbackData = {};
 
-    // TODO 测试
-    username = 'test';
-
     // 点击提交按钮
     $scope.feedback = function () {
       if ($scope.feedbackData.problem == '' || $scope.feedbackData.problem == null ||
@@ -240,7 +231,7 @@ angular.module('setting.controller', ['setting.service'])
       console.log('feedback start:', $scope.feedbackData);
       $http.post(urlFeedback, {
         data: $scope.feedbackData,
-        username: username,
+        username: localStorage.getItem('username'),
         method: 'feedback'
       }).success(function (response) {
         console.log('feedback success:', response);

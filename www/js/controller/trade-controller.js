@@ -9,10 +9,6 @@ angular.module('trade.controller', ['trade.service'])
       $scope.modal = modal;
     });
 
-    // TODO 测试
-    username = 'test';
-    usercode = '1234';
-
     // 商品编码
     var plucode;
     // 已添加的商品
@@ -52,7 +48,7 @@ angular.module('trade.controller', ['trade.service'])
       console.log('select commodity start:', $scope.tradeData.plucode);
       $http.post(urlTrade, {
         data: plucode,
-        username: username,
+        username: localStorage.getItem('username'),
         method: 'selectCommodity'
       }).success(function (response) {
         console.log('select commodity success:', response);
@@ -168,7 +164,8 @@ angular.module('trade.controller', ['trade.service'])
         //生成流水号，流水号 = 当前时间(yyyyMMddHHmm) + 用户编码 + 四位随机数
         var randNum = Math.round(Math.random() * 1000);
         randNum = formatNumber(randNum, 4, '0', 'l');
-        $scope.tradeData.order = formatDate(new Date()) + usercode + randNum;
+        $scope.tradeData.order = formatDate(new Date()) +
+          localStorage.getItem('usercode') + randNum;
       }
 
       hasPay = parseFloat(hasPay).toFixed(2);
@@ -479,7 +476,7 @@ angular.module('trade.controller', ['trade.service'])
         console.log('verifyVip start:', cardfno);
         $http.post(urlTrade, {
           data: cardfno,
-          username: username,
+          username: localStorage.getItem('username'),
           method: 'vipVerify'
         }).success(function (response) {
           console.log('verifyVip success:', response);
@@ -650,7 +647,7 @@ angular.module('trade.controller', ['trade.service'])
       console.log('saveOrder start:', $scope.tradeData.commodity);
       $http.post(urlTrade, {
         data: $scope.tradeData.commodity,
-        username: username,
+        username: localStorage.getItem('username'),
         order: $scope.tradeData.order,
         total: $scope.tradeData.total,
         cardfaceno: cardfaceno,
@@ -677,7 +674,7 @@ angular.module('trade.controller', ['trade.service'])
       console.log('savePay start:', $scope.tradeData.pay);
       $http.post(urlTrade, {
         data: $scope.tradeData.pay,
-        username: username,
+        username: localStorage.getItem('username'),
         order: $scope.tradeData.order,
         haspay: $scope.tradeData.hasPay,
         change: $scope.tradeData.change,

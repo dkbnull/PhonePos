@@ -11,16 +11,15 @@ angular.module('route', [
   'setting.route'
 ])
 
-  .config(function ($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise('/pos/login');
-  });
-
-// .config(function ($stateProvider, $urlRouterProvider) {
-//   // 第一次登陆
-//   if (localStorage["isFirst"]) {
-//     $urlRouterProvider.otherwise('/pos/login');
-//   }
-//   else {
-//     $urlRouterProvider.otherwise('/guidePage');
-//   }
+// .config(function ($urlRouterProvider) {
+//   $urlRouterProvider.otherwise('/pos/login');
 // });
+
+  .config(function ($urlRouterProvider) {
+    if (localStorage.getItem('username') == null) {
+      $urlRouterProvider.otherwise('/pos/login');
+    }
+    else {
+      $urlRouterProvider.otherwise('/menu/trade');
+    }
+  });

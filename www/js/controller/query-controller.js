@@ -8,10 +8,6 @@ angular.module('query.controller', ['query.service'])
     $scope.querySale = false;
     $scope.queryCommoditys = false;
 
-    // TODO 测试
-    username = 'test';
-    usercode = '1234';
-
     // 调用的方法
     var method = '';
     // 关键字
@@ -50,7 +46,7 @@ angular.module('query.controller', ['query.service'])
 
       console.log(method + ' start');
       $http.post(urlQuery, {
-        username: username,
+        username: localStorage.getItem('username'),
         method: method
       }).success(function (response) {
         console.log(method + ' success:', response);
@@ -98,7 +94,7 @@ angular.module('query.controller', ['query.service'])
       console.log(method + ' start:', $scope.queryData.input);
       $http.post(urlQuery, {
         data: input.toString(),
-        username: username,
+        username: localStorage.getItem('username'),
         method: method
       }).success(function (response) {
         console.log(method + ' success:', response);

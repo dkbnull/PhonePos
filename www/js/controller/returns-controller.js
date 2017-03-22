@@ -12,10 +12,6 @@ angular.module('returns.controller', ['returns.service'])
     $scope.returnsBlank = true;
     $scope.returnsOrder = false;
 
-    // TODO 测试
-    username = 'test';
-    usercode = '1234';
-
     // 订单流水号
     var order;
     // 订单合计
@@ -56,7 +52,7 @@ angular.module('returns.controller', ['returns.service'])
       console.log('select order start:', $scope.returnsData.ordernum);
       $http.post(urlReturns, {
         data: order.toString(),
-        username: username,
+        username: localStorage.getItem('username'),
         method: 'selectOrder'
       }).success(function (response) {
         console.log('select order success:', response);
@@ -391,7 +387,7 @@ angular.module('returns.controller', ['returns.service'])
       console.log('saveReturns start:', $scope.returnsData.commodity);
       $http.post(urlReturns, {
         data: $scope.returnsData.commodity,
-        username: username,
+        username: localStorage.getItem('username'),
         order: $scope.returnsData.order,
         total: $scope.returnsData.total,
         cardfaceno: cardfaceno,
@@ -418,7 +414,7 @@ angular.module('returns.controller', ['returns.service'])
       console.log('saveReturnsPay start:', $scope.returnsData.pay);
       $http.post(urlReturns, {
         data: $scope.returnsData.pay,
-        username: username,
+        username: localStorage.getItem('username'),
         order: $scope.returnsData.order,
         haspay: $scope.returnsData.hasPay,
         method: 'saveReturnsPay'

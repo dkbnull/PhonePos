@@ -22,8 +22,9 @@ angular.module('login.controller', ['login.service'])
       }).success(function (response) {
         console.log('login success:', response);
         if (response.msgcode == 1) {
-          username = $scope.loginData.username;
-          usercode = response.msgmain.usercode;
+          localStorage.setItem('username', $scope.loginData.username);
+          localStorage.setItem('password', $scope.loginData.password);
+          localStorage.setItem('usercode', response.msgmain.usercode);
           $state.go('menu.trade');
           // location.href = '#/menu/trade';
         } else {

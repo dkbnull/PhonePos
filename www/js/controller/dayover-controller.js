@@ -2,10 +2,6 @@ angular.module('dayover.controller', ['dayover.service'])
   .controller('dayoverCtrl', function ($scope, $http, $ionicPopup) {
     $scope.dayoverData = {};
 
-    // TODO 测试
-    username = 'test';
-    usercode = '1234';
-
     var date = new Date();
     date = formatDate(date);
     date = date.substring(0, 8);
@@ -18,7 +14,7 @@ angular.module('dayover.controller', ['dayover.service'])
     console.log('load dayover start', date);
     $http.post(urlDayover, {
       data: date,
-      username: username,
+      username: localStorage.getItem('username'),
       method: 'loadDayover'
     }).success(function (response) {
       console.log('load dayover success:', response);
@@ -38,7 +34,7 @@ angular.module('dayover.controller', ['dayover.service'])
         data: $scope.dayoverData.dayover,
         date: $scope.dayoverData.date,
         total: $scope.dayoverData.total,
-        username: username,
+        username: localStorage.getItem('username'),
         method: 'dayover'
       }).success(function (response) {
         console.log('dayover success:', response);
@@ -92,7 +88,7 @@ angular.module('dayover.controller', ['dayover.service'])
       } else {
         $ionicPopup.alert({
           title: '提示',
-          template: '日结信息错误',
+          template: '日结信息为空',
           okText: '确定'
         });
       }
