@@ -13,6 +13,21 @@ login.html
 /**
 menu.html
  */
+.menu-open .ion-navicon {
+  transform: rotate(-360deg);
+  -webkit-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+.menu-open .ion-navicon:before {
+  content: "\f2ca";
+}
+
+.menu-left-main {
+  height: 100%;
+  /*margin-top: 40%;*/
+}
+
 .menu.menu-left * {
   /*font-weight: bold;*/
 }
@@ -29,40 +44,26 @@ menu.html
   margin-left: 5%;
   margin-top: 5%;
   height: 50%;
-  background: none;
 }
 
 .expanded-bottom {
   /*font-weight: bold;*/
-  margin-top: 45%;
-  margin-left: -30%;
-  height: 10%;
+  /*margin-top: 45%;*/
+  /*margin-left: -30%;*/
+  margin-top: 5%;
+  margin-left: 5%;
+  /*height: 10%;*/
   width: 100%;
   font-size: 1.3em;
   color: #fff;
-  background: none;
-}
-
-.menu-left-main {
-  margin-top: 40%;
 }
 
 .menu-left-main .item .item-content {
   font-size: 1.1em;
 }
 
-.menu-open .ion-navicon {
-  transform: rotate(-360deg);
-  -webkit-transition: all 0.2s ease-in-out;
-  transition: all 0.2s ease-in-out;
-}
-
-.menu-open .ion-navicon:before {
-  content: "\f2ca";
-}
-
 .menu-item {
-  margin-top: 85%;
+  margin-top: 70%;
   display: flex;
   padding: 0 10%;
   font-size: 1.3em;
