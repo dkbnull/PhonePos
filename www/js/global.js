@@ -3,6 +3,9 @@
  */
 angular.module('global', [])
   .constant("GlobalVariable", {
-    'SERVER_PATH': '192.168.1.1:8080/',
+    'SERVER_PATH': 'http://localhost/PhonePos/',
+    // 'SERVER_PATH': 'http://123.206.23.41/PhonePos/',
+    'LOGIN': 'user.php',
+    'TRADE': 'trade.php',
     'VERSION': "1.0.0"
   });
