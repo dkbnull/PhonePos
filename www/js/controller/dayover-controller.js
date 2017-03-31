@@ -1,5 +1,5 @@
 angular.module('dayover.controller', ['dayover.service'])
-  .controller('dayoverCtrl', function ($scope, $http, $ionicPopup) {
+  .controller('dayoverCtrl', function ($scope, dayoverFty, commonFty) {
     $scope.dayoverData = {};
 
     var date = new Date();
@@ -11,62 +11,57 @@ angular.module('dayover.controller', ['dayover.service'])
       + date.substring(6, 8);
     $scope.dayoverData.total = '0.00';
 
-    console.log('load dayover start', date);
-    $http.post(urlDayover, {
-      data: date,
-      username: localStorage.getItem('username'),
-      method: 'loadDayover'
-    }).success(function (response) {
-      console.log('load dayover success:', response);
-      afterLoadDayover(response);
-    }).error(function () {
-      console.log('load dayover fail:', '网络异常');
-      $ionicPopup.alert({
-        title: '提示',
-        template: '网络异常',
-        okText: '确定'
-      });
-    });
+    var promise = dayoverFty.loadDayover(date, localStorage.getItem('username'));
+    promise.then(
+      function (response) {
+        if (response) {
+          afterLoadDayover(response);
+        }
+        else {
+          commonFty.alertPopup('未知错误');
+        }
+      },
+      function (response) {
+        if (response) {
+          commonFty.alertPopup(response);
+        } else {
+          commonFty.alertPopup('网络异常');
+        }
+      }
+    );
 
     $scope.dayoverConfirm = function () {
-      console.log('dayover start', date);
-      $http.post(urlDayover, {
-        data: $scope.dayoverData.dayover,
-        date: $scope.dayoverData.date,
-        total: $scope.dayoverData.total,
-        username: localStorage.getItem('username'),
-        method: 'dayover'
-      }).success(function (response) {
-        console.log('dayover success:', response);
-        if (response.msgcode == 1) {
-          $ionicPopup.alert({
-            title: '提示',
-            template: '日结成功',
-            okText: '确定'
-          });
-        } else {
-          if (response.msgmain = 'has dayover') {
-            $ionicPopup.alert({
-              title: '提示',
-              template: '今天已经日结，无需重复日结',
-              okText: '确定'
-            });
+      var data = $scope.dayoverData.dayover;
+      var date = $scope.dayoverData.date;
+      var total = $scope.dayoverData.total;
+      var username = localStorage.getItem('username');
+
+      var promise = dayoverFty.dayover(data, date, total, username);
+      promise.then(
+        function (response) {
+          if (response) {
+            if (response.msgcode == 1) {
+              commonFty.alertPopup('日结成功');
+            } else {
+              if (response.msgmain = 'has dayover') {
+                commonFty.alertPopup('今天已经日结，无需重复日结');
+              } else {
+                commonFty.alertPopup('日结失败，请重新日结');
+              }
+            }
+          }
+          else {
+            commonFty.alertPopup('未知错误');
+          }
+        },
+        function (response) {
+          if (response) {
+            commonFty.alertPopup(response);
           } else {
-            $ionicPopup.alert({
-              title: '提示',
-              template: '日结失败，请重新日结',
-              okText: '确定'
-            });
+            commonFty.alertPopup('网络异常');
           }
         }
-      }).error(function () {
-        console.log('dayover fail:', '网络异常');
-        $ionicPopup.alert({
-          title: '提示',
-          template: '网络异常',
-          okText: '确定'
-        });
-      });
+      )
     };
 
     /**
@@ -86,11 +81,7 @@ angular.module('dayover.controller', ['dayover.service'])
 
         $scope.dayoverData.total = total.toFixed(2);
       } else {
-        $ionicPopup.alert({
-          title: '提示',
-          template: '日结信息为空',
-          okText: '确定'
-        });
+        commonFty.alertPopup('日结信息为空');
       }
     }
   });

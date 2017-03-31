@@ -9,4 +9,4 @@ var urlFeedback = website + 'feedback.php';
 // var urlTrade = website + 'trade.php';
 // var urlQuery = website + 'query.php';
 // var urlReturns = website + 'returns.php';
-var urlDayover = website + 'dayover.php';
+// var urlDayover = website + 'dayover.php';

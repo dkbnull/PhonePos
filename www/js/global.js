@@ -9,5 +9,6 @@ angular.module('global', [])
     'TRADE': 'trade.php',
     'QUERY': 'query.php',
     'RETURNS': 'returns.php',
+    'DAYOVER': 'dayover.php',
     'VERSION': "1.0.0"
   });
