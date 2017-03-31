@@ -7,5 +7,7 @@ angular.module('global', [])
     // 'SERVER_PATH': 'http://123.206.23.41/PhonePos/',
     'LOGIN': 'user.php',
     'TRADE': 'trade.php',
+    'QUERY': 'query.php',
+    'RETURNS': 'returns.php',
     'VERSION': "1.0.0"
   });

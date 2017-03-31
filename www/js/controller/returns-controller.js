@@ -1,5 +1,5 @@
 angular.module('returns.controller', ['returns.service'])
-  .controller('returnsCtrl', function ($scope, $http, $ionicModal, $ionicPopup) {
+  .controller('returnsCtrl', function ($scope, $ionicModal, returnsFty, tradeFty, commonFty) {
     $scope.returnsData = {};
 
     $ionicModal.fromTemplateUrl('templates/returns-pay.html', {
@@ -25,13 +25,8 @@ angular.module('returns.controller', ['returns.service'])
 
     // 点击退货按钮
     $scope.returnsReturns = function () {
-      if ($scope.returnsData.ordernum == '' || $scope.returnsData.ordernum == null ||
-        $scope.returnsData.ordernum == undefined) {
-        $ionicPopup.alert({
-          title: '提示',
-          template: '订单流水号不能为空',
-          okText: '确定'
-        });
+      if (!$scope.returnsData.ordernum) {
+        commonFty.alertPopup('订单流水号不能为空');
         return false;
       }
 
@@ -41,30 +36,28 @@ angular.module('returns.controller', ['returns.service'])
       date.setDate(date.getDate() - 7);
       date = formatDate(date);
       if (order.substring(0, 8) < date.substring(0, 8)) {
-        $ionicPopup.alert({
-          title: '提示',
-          template: '超出退货期限',
-          okText: '确定'
-        });
+        commonFty.alertPopup('超出退货期限');
         return false;
       }
 
-      console.log('select order start:', $scope.returnsData.ordernum);
-      $http.post(urlReturns, {
-        data: order.toString(),
-        username: localStorage.getItem('username'),
-        method: 'selectOrder'
-      }).success(function (response) {
-        console.log('select order success:', response);
-        afterSelectOrder(response);
-      }).error(function () {
-        console.log('select order fail:', '网络异常');
-        $ionicPopup.alert({
-          title: '提示',
-          template: '网络异常',
-          okText: '确定'
-        });
-      });
+      var promise = returnsFty.selectOrder(order.toString(), localStorage.getItem('username'));
+      promise.then(
+        function (response) {
+          if (response) {
+            afterSelectOrder(response);
+          }
+          else {
+            commonFty.alertPopup('未知错误');
+          }
+        },
+        function (response) {
+          if (response) {
+            commonFty.alertPopup(response);
+          } else {
+            commonFty.alertPopup('网络异常');
+          }
+        }
+      )
     };
 
     // 点击确认按钮
@@ -87,17 +80,14 @@ angular.module('returns.controller', ['returns.service'])
       // 设置删除退款按钮不可见
       $scope.returnsData.deletePay = false;
 
-      $ionicPopup.confirm({
-        title: '提示',
-        template: '该操作将清空退款信息，确认关闭退款页面',
-        okText: '确定',
-        cancelText: '取消'
-      }).then(function (result) {
-        if (result) {
-          initializeInfo();
-          $scope.modal.hide();
+      commonFty.confirmPopup('该操作将清空退款信息，确认关闭退款页面').then(
+        function (response) {
+          if (response) {
+            initializeInfo();
+            $scope.modal.hide();
+          }
         }
-      });
+      )
     };
 
     // 点击 returns-pay.html 某一支付方式按钮
@@ -105,40 +95,18 @@ angular.module('returns.controller', ['returns.service'])
       // 设置删除退款按钮不可见
       $scope.returnsData.deletePay = false;
 
-      $scope.popupTradeData = {};
-
       if ($scope.returnsData.noPay == 0) {
-        $ionicPopup.alert({
-          title: '提示',
-          template: '当前订单已退款完成，无需再进行退款',
-          okText: '确定'
-        });
+        commonFty.alertPopup('当前订单已退款完成，无需再进行退款');
         return false;
       }
-      $ionicPopup.show({
-        title: pm['payname'],
-        template: '<input type="number" placeholder="请输入退款金额" ng-model="popupTradeData.total">',
-        scope: $scope,
-        buttons: [
-          {
-            text: "取消",
-            onTap: function () {
-              return false;
-            }
-          },
-          {
-            text: "确定",
-            type: "button-positive",
-            onTap: function () {
-              return true;
-            }
+
+      var message = '<input type="number" placeholder="请输入退款金额" id="input">';
+      commonFty.showPopup('会员', message).then(
+        function (response) {
+          if (response.result) {
+            returnsOrder(pm, response.input);
           }
-        ]
-      }).then(function (result) {
-        if (result) {
-          returnsOrder(pm, $scope.popupTradeData.total);
-        }
-      });
+        })
     };
 
     // 点击删除退款按钮
@@ -148,38 +116,32 @@ angular.module('returns.controller', ['returns.service'])
 
     // 删除某一退款方式
     $scope.returnsDeletePayItem = function (p) {
-      $ionicPopup.confirm({
-        title: '提示',
-        template: '该操作不可撤销，是否删除当前退款',
-        okText: '确定',
-        cancelText: '取消'
-      }).then(function (result) {
-        if (result) {
-          deleteLinePay(p);
+      commonFty.confirmPopup('该操作不可撤销，是否删除当前退款').then(
+        function (response) {
+          if (response) {
+            deleteLinePay(p);
+          }
         }
-      });
+      )
     };
 
     // 点击清空退款按钮
     $scope.returnsClearPay = function () {
-      $ionicPopup.confirm({
-        title: '提示',
-        template: '该操作不可撤销，是否清空当前退款',
-        okText: '确定',
-        cancelText: '取消'
-      }).then(function (result) {
-        if (result) {
-          pay = '';
-          $scope.returnsData.pay = pay;
+      commonFty.confirmPopup('该操作不可撤销，是否清空当前退款').then(
+        function (response) {
+          if (response) {
+            pay = '';
+            $scope.returnsData.pay = pay;
 
-          hasPay = 0;
-          hasPay = hasPay.toFixed(2);
-          noPay = parseFloat(total);
-          noPay = noPay.toFixed(2);
-          $scope.returnsData.hasPay = hasPay;
-          $scope.returnsData.noPay = noPay;
+            hasPay = 0;
+            hasPay = hasPay.toFixed(2);
+            noPay = parseFloat(total);
+            noPay = noPay.toFixed(2);
+            $scope.returnsData.hasPay = hasPay;
+            $scope.returnsData.noPay = noPay;
+          }
         }
-      });
+      )
     };
 
     // 点击完成退款按钮
@@ -188,24 +150,17 @@ angular.module('returns.controller', ['returns.service'])
       $scope.returnsData.deletePay = false;
 
       if ($scope.returnsData.noPay != 0) {
-        $ionicPopup.alert({
-          title: '提示',
-          template: '当前订单未退款完成，不能完成退款',
-          okText: '确定'
-        });
+        commonFty.alertPopup('当前订单未退款完成，不能完成退款');
         return false;
       }
 
-      $ionicPopup.confirm({
-        title: '提示',
-        template: '是否完成退款',
-        okText: '确定',
-        cancelText: '取消'
-      }).then(function (result) {
-        if (result) {
-          returnsEndPay();
+      commonFty.confirmPopup('是否完成退款').then(
+        function (response) {
+          if (response) {
+            returnsEndPay();
+          }
         }
-      });
+      )
     };
 
     /**
@@ -217,13 +172,8 @@ angular.module('returns.controller', ['returns.service'])
       var commodityinfo, payinfo;
 
       if (response.msgcode == 1) {
-        if (!(response.msgmain.username == '' || response.msgmain.username == null ||
-          response.msgmain.username == undefined)) {
-          $ionicPopup.alert({
-            title: '提示',
-            template: '该订单已经退款',
-            okText: '确定'
-          });
+        if (response.msgmain.username) {
+          commonFty.alertPopup('该订单已经退款');
           return false;
         }
 
@@ -237,10 +187,10 @@ angular.module('returns.controller', ['returns.service'])
         console.log('afterSelectOrder read info success cardfaceno:', cardfaceno);
 
         $scope.returnsData.order = order;
-        if (cardfaceno == '') {
-          $scope.returnsData.customer = '普通';
-        } else {
+        if (cardfaceno) {
           $scope.returnsData.customer = '会员';
+        } else {
+          $scope.returnsData.customer = '普通';
         }
         $scope.returnsData.commodity = commodityinfo;
         $scope.returnsData.total = total;
@@ -248,11 +198,7 @@ angular.module('returns.controller', ['returns.service'])
         $scope.returnsBlank = false;
         $scope.returnsOrder = true;
       } else {
-        $ionicPopup.alert({
-          title: '提示',
-          template: '该订单不存在',
-          okText: '确定'
-        });
+        commonFty.alertPopup('该订单不存在');
       }
     }
 
@@ -260,23 +206,29 @@ angular.module('returns.controller', ['returns.service'])
      * 加载退款支付方式
      */
     function loadPayMode() {
-      console.log('loadPayMode start');
-      $http.post(urlTrade, {
-        method: 'loadPayMode'
-      }).success(function (response) {
-        console.log('loadPayMode success:', response);
-        if (response.msgcode == 1) {
-          $scope.returnsData.payMode = response.msgmain;
-          $scope.modal.show();
+      var promise = tradeFty.loadPayMode();
+      promise.then(
+        function (response) {
+          if (response) {
+            if (response.msgcode == 1) {
+              $scope.returnsData.payMode = response.msgmain;
+              $scope.modal.show();
+            } else {
+              commonFty.alertPopup('加载支付方式出错');
+            }
+          }
+          else {
+            commonFty.alertPopup('未知错误');
+          }
+        },
+        function (response) {
+          if (response) {
+            commonFty.alertPopup(response);
+          } else {
+            commonFty.alertPopup('网络异常');
+          }
         }
-      }).error(function () {
-        console.log('loadPayMode fail:', '网络异常');
-        $ionicPopup.alert({
-          title: '提示',
-          template: '网络异常',
-          okText: '确定'
-        });
-      });
+      )
     }
 
     /**
@@ -287,29 +239,17 @@ angular.module('returns.controller', ['returns.service'])
      */
     function returnsOrder(pm, total) {
       if (total <= 0) {
-        $ionicPopup.alert({
-          title: '提示',
-          template: '退款金额错误',
-          okText: '确定'
-        });
+        commonFty.alertPopup('退款金额错误');
         return false;
-      } else if (total == '' || total == null || total == undefined) {
-        $ionicPopup.alert({
-          title: '提示',
-          template: '退款金额不能为空',
-          okText: '确定'
-        });
+      } else if (!total) {
+        commonFty.alertPopup('退款金额不能为空');
         return false;
       } else if (total > parseFloat(noPay)) {
-        $ionicPopup.alert({
-          title: '提示',
-          template: '退款金额超出最大可退款金额',
-          okText: '确定'
-        });
+        commonFty.alertPopup('退款金额超出最大可退款金额');
         return false;
       }
 
-      total = total.toFixed(2);
+      total = parseFloat(total).toFixed(2);
       if (pay == '') {
         pay = '{' +
           '"no": "1",' +
@@ -384,54 +324,67 @@ angular.module('returns.controller', ['returns.service'])
      * 保存退款信息
      */
     function saveReturns() {
-      console.log('saveReturns start:', $scope.returnsData.commodity);
-      $http.post(urlReturns, {
-        data: $scope.returnsData.commodity,
-        username: localStorage.getItem('username'),
-        order: $scope.returnsData.order,
-        total: $scope.returnsData.total,
-        cardfaceno: cardfaceno,
-        method: 'saveReturns'
-      }).success(function (response) {
-        console.log('saveReturns success:', response);
-        if (response.msgcode == 1) {
-          saveReturnsPay();
+      var data = $scope.returnsData.commodity;
+      var username = localStorage.getItem('username');
+      var order = $scope.returnsData.order;
+      var total = $scope.returnsData.total;
+
+      var promise = returnsFty.saveReturns(data, username, order, total, cardfaceno);
+      promise.then(
+        function (response) {
+          if (response) {
+            if (response.msgcode == 1) {
+              saveReturnsPay();
+            } else {
+              commonFty.alertPopup('保存退款信息出错');
+            }
+          }
+          else {
+            commonFty.alertPopup('未知错误');
+          }
+        },
+        function (response) {
+          if (response) {
+            commonFty.alertPopup(response);
+          } else {
+            commonFty.alertPopup('网络异常');
+          }
         }
-      }).error(function () {
-        console.log('saveReturns fail:', '网络异常');
-        $ionicPopup.alert({
-          title: '提示',
-          template: '网络异常',
-          okText: '确定'
-        });
-      });
+      )
     }
 
     /**
      * 保存退款支付信息
      */
     function saveReturnsPay() {
-      console.log('saveReturnsPay start:', $scope.returnsData.pay);
-      $http.post(urlReturns, {
-        data: $scope.returnsData.pay,
-        username: localStorage.getItem('username'),
-        order: $scope.returnsData.order,
-        haspay: $scope.returnsData.hasPay,
-        method: 'saveReturnsPay'
-      }).success(function (response) {
-        console.log('saveReturnsPay success:', response);
-        if (response.msgcode == 1) {
-          initializeInfo();
-          $scope.modal.hide();
+      var data = $scope.returnsData.pay;
+      var username = localStorage.getItem('username');
+      var order = $scope.returnsData.order;
+      var haspay = $scope.returnsData.hasPay;
+
+      var promise = returnsFty.saveReturnsPay(data, username, order, haspay);
+      promise.then(
+        function (response) {
+          if (response) {
+            if (response.msgcode == 1) {
+              initializeInfo();
+              $scope.modal.hide();
+            } else {
+              commonFty.alertPopup('保存退款支付信息出错');
+            }
+          }
+          else {
+            commonFty.alertPopup('未知错误');
+          }
+        },
+        function (response) {
+          if (response) {
+            commonFty.alertPopup(response);
+          } else {
+            commonFty.alertPopup('网络异常');
+          }
         }
-      }).error(function () {
-        console.log('saveReturnsPay fail:', '网络异常');
-        $ionicPopup.alert({
-          title: '提示',
-          template: '网络异常',
-          okText: '确定'
-        });
-      });
+      )
     }
 
     /**
