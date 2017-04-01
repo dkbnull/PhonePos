@@ -10,5 +10,8 @@ angular.module('global', [])
     'QUERY': 'query.php',
     'RETURNS': 'returns.php',
     'DAYOVER': 'dayover.php',
+    'SETTING_PERSON': 'user.php',
+    'SETTING_SYSTEM': 'system.php',
+    'FEEDBACK': 'feedback.php',
     'VERSION': "1.0.0"
   });
