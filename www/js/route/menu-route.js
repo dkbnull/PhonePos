@@ -5,12 +5,14 @@ angular.module('menu.route', ['menu.controller'])
       .state('menu', {
         url: '/menu',
         abstract: false,
+        cache: false,
         templateUrl: 'templates/menu.html',
         controller: 'menuCtrl'
       })
 
       .state('menu.trade', {
         url: '/trade',
+        cache: false,
         views: {
           'menuContent': {
             templateUrl: 'templates/trade.html',
@@ -21,6 +23,7 @@ angular.module('menu.route', ['menu.controller'])
 
       .state('menu.query', {
         url: '/query',
+        cache: false,
         views: {
           'menuContent': {
             templateUrl: 'templates/query.html',
@@ -31,6 +34,7 @@ angular.module('menu.route', ['menu.controller'])
 
       .state('menu.returns', {
         url: '/returns',
+        cache: false,
         views: {
           'menuContent': {
             templateUrl: 'templates/returns.html',
@@ -41,6 +45,7 @@ angular.module('menu.route', ['menu.controller'])
 
       .state('menu.dayover', {
         url: '/dayover',
+        cache: false,
         views: {
           'menuContent': {
             templateUrl: 'templates/dayover.html',
@@ -51,6 +56,7 @@ angular.module('menu.route', ['menu.controller'])
 
       .state('menu.setting', {
         url: '/setting',
+        cache: false,
         views: {
           'menuContent': {
             templateUrl: 'templates/setting.html',
