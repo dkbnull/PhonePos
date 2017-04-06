@@ -101,7 +101,7 @@ angular.module('returns.controller', ['returns.service'])
       }
 
       var message = '<input type="number" placeholder="请输入退款金额" id="input">';
-      commonFty.showPopup('会员', message).then(
+      commonFty.showPopup(pm['payname'], message).then(
         function (response) {
           if (response.result) {
             returnsOrder(pm, response.input);
