@@ -237,7 +237,7 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
           if (response.msgmain.issale == '0') {
             commonFty.alertPopup('该商品已下架');
           } else if (response.msgmain.isinventory == '0') {
-            commonFty.alertPopup('该商品已库存为零');
+            commonFty.alertPopup('该商品库存为零');
           } else if (response.msgmain.ispresent == '1') {
             commonFty.confirmPopup('该商品为赠品，是否销售').then(
               function (responsePopup) {
