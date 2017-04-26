@@ -54,6 +54,17 @@ angular.module('menu.route', ['menu.controller'])
         }
       })
 
+      .state('menu.monthover', {
+        url: '/monthover',
+        cache: false,
+        views: {
+          'menuContent': {
+            templateUrl: 'templates/monthover.html',
+            controller: 'monthoverCtrl'
+          }
+        }
+      })
+
       .state('menu.setting', {
         url: '/setting',
         cache: false,

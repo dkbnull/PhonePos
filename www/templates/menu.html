@@ -23,19 +23,22 @@
         </div>
       </div>
       <ion-list>
-        <ion-item menu-close ui-sref="menu.trade">
+        <ion-item menu-close ui-sref="menu.trade" ng-show="menuTradeItem">
           销售
         </ion-item>
-        <ion-item menu-close ui-sref="menu.query">
+        <ion-item menu-close ui-sref="menu.query" ng-show="menuQueryItem">
           查询
         </ion-item>
-        <ion-item menu-close ui-sref="menu.returns">
+        <ion-item menu-close ui-sref="menu.returns" ng-show="menuReturnsItem">
           退货
         </ion-item>
-        <ion-item menu-close ui-sref="menu.dayover">
+        <ion-item menu-close ui-sref="menu.dayover" ng-show="menuDayoverItem">
           日结
         </ion-item>
-        <div class="menu-item">
+        <ion-item menu-close ui-sref="menu.monthover" ng-show="menuMonthoverItem">
+          月结
+        </ion-item>
+        <div class="menu-item" ng-show="menuSettingItem">
           <div menu-close ui-sref="menu.setting" class="menu-item-setting">
             <i class="icon ion-gear-a"></i>
             设置

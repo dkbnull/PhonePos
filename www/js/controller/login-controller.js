@@ -17,7 +17,12 @@ angular.module('login.controller', ['login.service', 'common.service'])
               localStorage.setItem('password', $scope.loginData.password);
               localStorage.setItem('usercode', response.msgmain.usercode);
               localStorage.setItem('name', response.msgmain.name);
-              $state.go('menu.trade');
+              localStorage.setItem('rank', response.msgmain.rank);
+              if (response.msgmain.rank == 1) {
+                $state.go('menu.trade');
+              } else {
+                $state.go('menu.query');
+              }
               // location.href = '#/menu/trade';
             } else {
               commonFty.alertPopup('用户名或密码错误');

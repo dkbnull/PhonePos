@@ -1,0 +1,26 @@
+<ion-view class="dayover" view-title="月结">
+  <ion-content>
+    <div class="dayover-info">
+      月份：
+      <span class="dayover-date" ng-bind="monthoverData.date"></span>
+    </div>
+    <div class="trade-main dayover-main">
+      <div class="padding-bottom dayover-item trade-title">
+        <div class="dayover-item-pay">支付方式</div>
+        <div class="dayover-item-total">支付金额</div>
+      </div>
+      <div class="padding-bottom dayover-item" ng-repeat="commod in monthoverData.monthover">
+        <div class="dayover-item-pay">{{commod.payname}}</div>
+        <div class="dayover-item-total">{{commod.paytotal}}</div>
+      </div>
+    </div>
+    <div class="dayover-info dayover-total">
+      合计：
+      <span ng-bind="monthoverData.total"></span>
+      元
+    </div>
+    <div class="padding">
+      <button class="button button-positive button-dayover" ng-click="monthoverConfirm()">月结</button>
+    </div>
+  </ion-content>
+</ion-view>

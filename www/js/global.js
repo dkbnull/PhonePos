@@ -10,6 +10,7 @@ angular.module('global', [])
     'QUERY': 'query.php',
     'RETURNS': 'returns.php',
     'DAYOVER': 'dayover.php',
+    'MONTHOVER': 'monthover.php',
     'SETTING_PERSON': 'user.php',
     'SETTING_SYSTEM': 'system.php',
     'FEEDBACK': 'feedback.php',

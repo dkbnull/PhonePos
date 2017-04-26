@@ -8,6 +8,7 @@ angular.module('route', [
   'query.route',
   'returns.route',
   'dayover.route',
+  'monthover.route',
   'setting.route'
 ])
 
