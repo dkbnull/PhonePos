@@ -58,6 +58,41 @@ angular.module('common.service', [])
         });
 
         return deferred.promise;
+      },
+
+      showPayPopup: function (title, message) {
+        var deferred = $q.defer();
+
+        $ionicPopup.show({
+          title: title,
+          template: message,
+          buttons: [
+            {
+              text: "取消",
+              onTap: function () {
+                return false;
+              }
+            },
+            {
+              text: "确定",
+              type: "button-positive",
+              onTap: function () {
+                return true;
+              }
+            }
+          ]
+        }).then(function (result) {
+          // deferred.resolve(result);
+          var totalAmount = document.getElementById("total-amount").value;
+          var authCode = document.getElementById("auth-code").value;
+          var response = '{"result":' + result + ',' +
+            '"totalAmount":"' + totalAmount + '",' +
+            '"authCode":"' + authCode + '"}';
+          response = JSON.parse(response);
+          deferred.resolve(response);
+        });
+
+        return deferred.promise;
       }
     }
   });

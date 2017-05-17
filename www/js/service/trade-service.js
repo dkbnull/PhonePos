@@ -106,6 +106,36 @@ angular.module('trade.service', [])
         return deferred.promise;
       },
 
+      thirdPay: function (data, sign, timestamp, payType) {
+        var deferred = $q.defer();
+        var url = GlobalVariable.AIP_PATH;
+
+        console.log('第三方支付 start:', data);
+        $http.post(url, {
+          partner_id: '*',
+          app_id: GlobalVariable.APP_ID,
+          method: GlobalVariable.AIP_PAY,
+          format: GlobalVariable.FORMAT,
+          charset: GlobalVariable.CHARSET,
+          sign_type: 'MD5',
+          sign: sign,
+          timestamp: timestamp,
+          version: GlobalVariable.VERSION,
+          pay_type: payType,
+          app_auth_token: '',
+          notify_url: '',
+          biz_content: data
+        }).success(function (response) {
+          console.log('非码优惠券支付 success:', response);
+          deferred.resolve(response);
+        }).error(function (response) {
+          console.log('非码优惠券支付 fail:', response);
+          deferred.reject(response);
+        });
+
+        return deferred.promise;
+      },
+
       fmPay: function (data, sign, timestamp) {
         var deferred = $q.defer();
         var url = GlobalVariable.AIP_PATH;
@@ -135,7 +165,5 @@ angular.module('trade.service', [])
 
         return deferred.promise;
       }
-
-
     };
   });
