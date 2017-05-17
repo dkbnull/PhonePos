@@ -449,6 +449,108 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
       }
 
       /**
+       * 第三方支付，根据 pm 区分微信支付、支付宝支付
+       *
+       * @param pm
+       * @param totalAmount 支付金额
+       * @param authCode 付款码
+       */
+      function thirdPay(pm, totalAmount, authCode) {
+        var payType;
+
+        switch (pm["paycode"]) {
+          case '2':
+            payType = 'ALIPAY';
+            break;
+          case '3':
+            payType = 'WXPAY';
+            break;
+          default:
+            break;
+        }
+
+        var timestamp = formatDateV2(new Date(), 'yyyy-MM-dd HH:mm:ss');
+
+        var sign = '';
+        var data = '{' +
+          '"out_trade_no":"' + $scope.tradeData.order + '",' +
+          '"scene":"bar_code",' +
+          '"auth_code":"' + authCode + '",' +
+          '"subject":"PhonePos 销售",' +
+          '"total_amount":"' + totalAmount + '"' +
+          '}';
+
+        var promise = tradeFty.thirdPay(data, sign, timestamp, payType);
+        promise.then(
+          function (response) {
+            if (response) {
+              if (response.return_code == 10000) {
+                payOrder(pm, totalAmount);
+              } else {
+                commonFty.alertPopup(response.return_msg);
+              }
+            }
+            else {
+              commonFty.alertPopup('未知错误');
+            }
+          },
+          function (response) {
+            if (response) {
+              commonFty.alertPopup(response);
+            } else {
+              commonFty.alertPopup('网络异常');
+            }
+          }
+        )
+      }
+
+      /**
+       * 非码优惠券支付
+       *
+       * @param pm
+       * @param number 非码优惠券号
+       */
+      function fmPay(pm, number) {
+        var timestamp = formatDateV2(new Date(), 'yyyy-MM-dd HH:mm:ss');
+        var businessDate = formatDateV2(new Date(), 'yyyyMMdd');
+
+        var sign = '';
+        var data = '{' +
+          '"amount":"5300",' +
+          '"business_date":"' + businessDate + '",' +
+          '"codes":[{"code":"' + number + '"}],' +
+          '"operator_id":"8002",' +
+          '"products":[{"consume_num":1,"pid":"011682","price":5300,"sec":1,"total":5300}],' +
+          '"reqtype":70,' +
+          '"station_id":"86010002",' +
+          '"store_id":"99999"' +
+          '}';
+
+        var promise = tradeFty.fmPay(data, sign, timestamp);
+        promise.then(
+          function (response) {
+            if (response) {
+              if (response.return_code == 100) {
+                payOrder(pm, response.biz_content.total_discount_amount);
+              } else {
+                commonFty.alertPopup(response.return_msg);
+              }
+            }
+            else {
+              commonFty.alertPopup('未知错误');
+            }
+          },
+          function (response) {
+            if (response) {
+              commonFty.alertPopup(response);
+            } else {
+              commonFty.alertPopup('网络异常');
+            }
+          }
+        )
+      }
+
+      /**
        * 支付订单
        *
        * @param pm 支付方式payMode
@@ -611,108 +713,6 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
                 $scope.modal.hide();
               } else {
                 commonFty.alertPopup('保存支付信息出错');
-              }
-            }
-            else {
-              commonFty.alertPopup('未知错误');
-            }
-          },
-          function (response) {
-            if (response) {
-              commonFty.alertPopup(response);
-            } else {
-              commonFty.alertPopup('网络异常');
-            }
-          }
-        )
-      }
-
-      /**
-       * 第三方支付，根据 pm 区分微信支付、支付宝支付
-       *
-       * @param pm
-       * @param totalAmount 支付金额
-       * @param authCode 付款码
-       */
-      function thirdPay(pm, totalAmount, authCode) {
-        var payType;
-
-        switch (pm["paycode"]) {
-          case '2':
-            payType = 'ALIPAY';
-            break;
-          case '3':
-            payType = 'WXPAY';
-            break;
-          default:
-            break;
-        }
-
-        var timestamp = formatDateV2(new Date(), 'yyyy-MM-dd HH:mm:ss');
-
-        var sign = '';
-        var data = '{' +
-          '"out_trade_no":"' + $scope.tradeData.order + '",' +
-          '"scene":"bar_code",' +
-          '"auth_code":"' + authCode + '",' +
-          '"subject":"PhonePos 销售",' +
-          '"total_amount":"' + totalAmount + '"' +
-          '}';
-
-        var promise = tradeFty.thirdPay(data, sign, timestamp, payType);
-        promise.then(
-          function (response) {
-            if (response) {
-              if (response.return_code == 10000) {
-                payOrder(pm, totalAmount);
-              } else {
-                commonFty.alertPopup(response.return_msg);
-              }
-            }
-            else {
-              commonFty.alertPopup('未知错误');
-            }
-          },
-          function (response) {
-            if (response) {
-              commonFty.alertPopup(response);
-            } else {
-              commonFty.alertPopup('网络异常');
-            }
-          }
-        )
-      }
-
-      /**
-       * 非码优惠券支付
-       *
-       * @param pm
-       * @param number 非码优惠券号
-       */
-      function fmPay(pm, number) {
-        var timestamp = formatDateV2(new Date(), 'yyyy-MM-dd HH:mm:ss');
-        var businessDate = formatDateV2(new Date(), 'yyyyMMdd');
-
-        var sign = '';
-        var data = '{' +
-          '"amount":"5300",' +
-          '"business_date":"' + businessDate + '",' +
-          '"codes":[{"code":"' + number + '"}],' +
-          '"operator_id":"8002",' +
-          '"products":[{"consume_num":1,"pid":"011682","price":5300,"sec":1,"total":5300}],' +
-          '"reqtype":70,' +
-          '"station_id":"86010002",' +
-          '"store_id":"99999"' +
-          '}';
-
-        var promise = tradeFty.fmPay(data, sign, timestamp);
-        promise.then(
-          function (response) {
-            if (response) {
-              if (response.return_code == 100) {
-                payOrder(pm, response.biz_content.total_discount_amount);
-              } else {
-                commonFty.alertPopup(response.return_msg);
               }
             }
             else {
