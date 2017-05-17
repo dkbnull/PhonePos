@@ -483,13 +483,12 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
         var promise = tradeFty.thirdPay(data, sign, timestamp, payType);
         promise.then(
           function (response) {
-            if (response) {
-              if (response.return_code == 10000) {
+            if (response)
+              if (response.biz_response.return_code == 100000) {
                 payOrder(pm, totalAmount);
               } else {
-                commonFty.alertPopup(response.return_msg);
+                commonFty.alertPopup(response.biz_response.return_msg);
               }
-            }
             else {
               commonFty.alertPopup('未知错误');
             }
@@ -530,10 +529,10 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
         promise.then(
           function (response) {
             if (response) {
-              if (response.return_code == 100) {
-                payOrder(pm, response.biz_content.total_discount_amount);
+              if (response.biz_response.return_code == 100000) {
+                payOrder(pm, response.biz_response.total_discount_amount);
               } else {
-                commonFty.alertPopup(response.return_msg);
+                commonFty.alertPopup(response.biz_response.return_msg);
               }
             }
             else {
