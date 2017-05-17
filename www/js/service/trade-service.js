@@ -110,7 +110,7 @@ angular.module('trade.service', [])
         var deferred = $q.defer();
         var url = GlobalVariable.AIP_PATH;
 
-        console.log('第三方支付 start:', data);
+        console.log('第三方支付支付 start:', data);
         $http.post(url, {
           partner_id: '*',
           app_id: GlobalVariable.APP_ID,
@@ -126,10 +126,10 @@ angular.module('trade.service', [])
           notify_url: '',
           biz_content: data
         }).success(function (response) {
-          console.log('非码优惠券支付 success:', response);
+          console.log('第三方支付支付 success:', response);
           deferred.resolve(response);
         }).error(function (response) {
-          console.log('非码优惠券支付 fail:', response);
+          console.log('第三方支付支付 fail:', response);
           deferred.reject(response);
         });
 

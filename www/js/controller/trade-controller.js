@@ -23,6 +23,10 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
       var hasPay = 0, noPay = 0, change = 0;
       // 已使用的支付方式
       var pay = '';
+      // 支付宝支付计数
+      var alipayNum = 0;
+      // 微信支付计数
+      var wxpayNum = 0;
 
       $scope.tradeData.customer = '普通';
       total = total.toFixed(2);
@@ -504,6 +508,10 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
        * @param p 要删除的支付方式
        */
       function deleteLinePay(p) {
+        if (pm["paycode"] == "2" || pm["paycode"] == "3" || pm["paycode"] == "2") {
+          commonFty.alertPopup('该支付方式不允许删除');
+        }
+
         console.log('deleteLinePay begin:', p);
         var index = $scope.tradeData.pay.indexOf(p);
         var total = $scope.tradeData.pay[index]['total'];

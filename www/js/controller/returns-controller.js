@@ -100,6 +100,39 @@ angular.module('returns.controller', ['returns.service'])
         return false;
       }
 
+      if (pm["paycode"] == "10") {
+        commonFty.alertPopup('不支持非码优惠券退款');
+        return false;
+      }
+
+      // 支付宝、微信支付
+      if (pm["paycode"] == "2" || pm["paycode"] == "3") {
+        var promise = returnsFty.selectPayType(pm["paycode"], order.toString());
+        promise.then(
+          function (response) {
+            if (response) {
+              if (response.msgcode == 1) {
+                thirdReturns(response.msgmain, pm);
+              } else {
+                commonFty.alertPopup('未知错误');
+              }
+            }
+            else {
+              commonFty.alertPopup('未知错误');
+            }
+          },
+          function (response) {
+            if (response) {
+              commonFty.alertPopup(response);
+            } else {
+              commonFty.alertPopup('网络异常');
+            }
+          }
+        );
+
+        return false;
+      }
+
       var message = '<input type="number" placeholder="请输入退款金额" id="input">';
       commonFty.showPopup(pm['payname'], message).then(
         function (response) {
@@ -286,6 +319,10 @@ angular.module('returns.controller', ['returns.service'])
      * @param p 要删除的支付方式
      */
     function deleteLinePay(p) {
+      if (pm["paycode"] == "2" || pm["paycode"] == "3" || pm["paycode"] == "2") {
+        commonFty.alertPopup('该退款方式不允许删除');
+      }
+
       console.log('deleteLinePay returns begin:', p);
       var index = $scope.returnsData.pay.indexOf(p);
       var total = $scope.returnsData.pay[index]['total'];
@@ -371,6 +408,64 @@ angular.module('returns.controller', ['returns.service'])
               $scope.modal.hide();
             } else {
               commonFty.alertPopup('保存退款支付信息出错');
+            }
+          }
+          else {
+            commonFty.alertPopup('未知错误');
+          }
+        },
+        function (response) {
+          if (response) {
+            commonFty.alertPopup(response);
+          } else {
+            commonFty.alertPopup('网络异常');
+          }
+        }
+      )
+    }
+
+    /**
+     * 退款到第三方，根据 pm 区分微信、支付宝
+     *
+     * @param msgmain
+     * @param pm
+     */
+    function thirdReturns(msgmain, pm) {
+      var payType;
+
+      if (msgmain.paynum == 0) {
+        commonFty.alertPopup('该订单未使用该付款方式付款，不能退款到该支付方式');
+        return false;
+      }
+
+      switch (pm["paycode"]) {
+        case '2':
+          payType = 'ALIPAY';
+          break;
+        case '3':
+          payType = 'WXPAY';
+          break;
+        default:
+          break;
+      }
+
+      var timestamp = formatDateV2(new Date(), 'yyyy-MM-dd HH:mm:ss');
+
+      var sign = '';
+      var data = '{' +
+        '"out_trade_no":"' + order + '",' +
+        '"total_amount":"' + msgmain.paytotal + '",' +
+        '"refund_amount":"' + msgmain.paytotal + '",' +
+        '}';
+
+      var promise = returnsFty.thirdReturns(data, sign, timestamp, payType);
+      promise.then(
+        function (response) {
+          if (response) {
+            if (response.return_code == 10000) {
+              returnsOrder(pm, totalAmount);
+            } else {
+              commonFty.alertPopup(response.return_msg);
             }
           }
           else {
