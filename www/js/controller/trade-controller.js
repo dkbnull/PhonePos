@@ -171,6 +171,45 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
           return false;
         }
 
+        // 支付宝支付
+        if (pm["paycode"] == "2") {
+          var message = '<input type="number" placeholder="请输入支付宝付款码" id="input">';
+          commonFty.showPopup('支付宝', message).then(
+            function (response) {
+              if (response.result) {
+                thirdPay(pm, response.input);
+              }
+            });
+
+          return true;
+        }
+
+        // 微信支付
+        if (pm["paycode"] == "3") {
+          var message = '<input type="number" placeholder="请输入微信付款码" id="input">';
+          commonFty.showPopup('微信', message).then(
+            function (response) {
+              if (response.result) {
+                thirdPay(pm, response.input);
+              }
+            });
+
+          return true;
+        }
+
+        // 非码券支付
+        if (pm["paycode"] == "10") {
+          var message = '<input type="number" placeholder="请输入非码优惠券号" id="input">';
+          commonFty.showPopup('非码券', message).then(
+            function (response) {
+              if (response.result) {
+                fmPay(pm, response.input);
+              }
+            });
+
+          return true;
+        }
+
         var message = '<input type="number" placeholder="请输入支付金额" id="input">';
         commonFty.showPopup(pm['payname'], message).then(
           function (response) {
@@ -592,6 +631,52 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
       }
 
       /**
+       * 非码优惠券支付
+       *
+       * @param pm
+       * @param number 非码优惠券号
+       */
+      function fmPay(pm, number) {
+        var timestamp = formatDateV2(new Date(), 'yyyy-MM-dd HH:mm:ss');
+        var businessDate = formatDateV2(new Date(), 'yyyyMMdd');
+
+        var sign = '';
+        var data = '{' +
+          '"amount":"5300",' +
+          '"business_date":"' + businessDate + '",' +
+          '"codes":[{"code":"' + number + '"}],' +
+          '"operator_id":"8002",' +
+          '"products":[{"consume_num":1,"pid":"011682","price":5300,"sec":1,"total":5300}],' +
+          '"reqtype":70,' +
+          '"station_id":"86010002",' +
+          '"store_id":"99999"' +
+          '}';
+
+        var promise = tradeFty.fmPay(data, sign, timestamp);
+        promise.then(
+          function (response) {
+            if (response) {
+              if (response.return_code != 100) {
+                payOrder(pm, response.biz_content.total_discount_amount);
+              } else {
+                commonFty.alertPopup(response.return_msg);
+              }
+            }
+            else {
+              commonFty.alertPopup('未知错误');
+            }
+          },
+          function (response) {
+            if (response) {
+              commonFty.alertPopup(response);
+            } else {
+              commonFty.alertPopup('网络异常');
+            }
+          }
+        )
+      }
+
+      /**
        * 初始化相关数据
        */
       function initializeInfo() {
@@ -636,7 +721,7 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
  * @return date 格式化后的日期
  */
 function formatDate(date) {
-  if (date == null || date == '' || date == undefined) {
+  if (!date) {
     date = new Date();
   }
 
@@ -677,4 +762,34 @@ function formatNumber(number, n, c, p) {
   }
 
   return number
+}
+
+/**
+ * 格式化日期为指定格式
+ *
+ * @param date 需要格式化的日期
+ * @param format 日期格式
+ * @return  格式化后的日期
+ */
+function formatDateV2(date, format) {
+  var o = {
+    'M+': date.getMonth() + 1,
+    'd+': date.getDate(),
+    'H+': date.getHours(),
+    'm+': date.getMinutes(),
+    's+': date.getSeconds(),
+    'S': date.getMilliseconds()
+  };
+
+  if (/(y+)/.test(format)) {
+    format = format.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+  }
+
+  for (var k in o) {
+    if (new RegExp('(' + k + ')').test(format)) {
+      format = format.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)));
+    }
+  }
+
+  return format;
 }
