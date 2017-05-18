@@ -22,6 +22,10 @@ angular.module('returns.controller', ['returns.service'])
     var pay = '';
     // 会员卡面号
     var cardfaceno = '';
+    // 是否已退款到支付宝
+    var hasAlipay = false;
+    // 是否已退款微信
+    var hasWxpay = false;
 
     // 点击退货按钮
     $scope.returnsReturns = function () {
@@ -107,12 +111,29 @@ angular.module('returns.controller', ['returns.service'])
 
       // 支付宝、微信支付
       if (pm["paycode"] == "2" || pm["paycode"] == "3") {
+        switch (pm["paycode"]) {
+          case '2':
+            if (hasAlipay) {
+              commonFty.alertPopup('已退款到支付宝，无需重复退款');
+              return false;
+            }
+            break;
+          case '3':
+            if (hasWxpay) {
+              commonFty.alertPopup('已退款到微信，无需重复退款');
+              return false;
+            }
+            break;
+          default:
+            break;
+        }
+
         var promise = returnsFty.selectPayType(pm["paycode"], order.toString());
         promise.then(
           function (response) {
             if (response) {
               if (response.msgcode == 1) {
-                thirdReturns(response.msgmain, pm);
+                thirdReturns(pm, response.msgmain);
               } else {
                 commonFty.alertPopup('未知错误');
               }
@@ -267,10 +288,10 @@ angular.module('returns.controller', ['returns.service'])
     /**
      * 退款到第三方，根据 pm 区分微信、支付宝
      *
-     * @param msgmain
      * @param pm
+     * @param msgmain
      */
-    function thirdReturns(msgmain, pm) {
+    function thirdReturns(pm, msgmain) {
       var payType;
 
       if (msgmain.paynum == 0) {
@@ -302,10 +323,10 @@ angular.module('returns.controller', ['returns.service'])
       promise.then(
         function (response) {
           if (response) {
-            if (response.return_code == 10000) {
-              returnsOrder(pm, totalAmount);
+            if (response.biz_response.return_code == 100000) {
+              returnsOrder(pm, response.biz_response.refund_fee);
             } else {
-              commonFty.alertPopup(response.return_msg);
+              commonFty.alertPopup(response.biz_response.return_msg);
             }
           }
           else {
@@ -369,6 +390,17 @@ angular.module('returns.controller', ['returns.service'])
       noPay = parseFloat(noPay).toFixed(2);
       $scope.returnsData.hasPay = hasPay;
       $scope.returnsData.noPay = noPay;
+
+      switch (pm["paycode"]) {
+        case '2':
+          hasAlipay = true;
+          break;
+        case '3':
+          hasWxpay = true;
+          break;
+        default:
+          break;
+      }
     }
 
     /**
@@ -377,7 +409,7 @@ angular.module('returns.controller', ['returns.service'])
      * @param p 要删除的支付方式
      */
     function deleteLinePay(p) {
-      if (pm["paycode"] == "2" || pm["paycode"] == "3" || pm["paycode"] == "2") {
+      if (pm["paycode"] == "2" || pm["paycode"] == "3" || pm["paycode"] == "10") {
         commonFty.alertPopup('该退款方式不允许删除');
       }
 

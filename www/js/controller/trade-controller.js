@@ -23,10 +23,10 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
       var hasPay = 0, noPay = 0, change = 0;
       // 已使用的支付方式
       var pay = '';
-      // 支付宝支付计数
-      var alipayNum = 0;
-      // 微信支付计数
-      var wxpayNum = 0;
+      // 是否已使用支付宝支付
+      var hasAlipay = false;
+      // 是否已使用微信支付
+      var hasWxpay = false;
 
       $scope.tradeData.customer = '普通';
       total = total.toFixed(2);
@@ -177,6 +177,23 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
 
         // 支付宝、微信支付
         if (pm["paycode"] == "2" || pm["paycode"] == "3") {
+          switch (pm["paycode"]) {
+            case '2':
+              if (hasAlipay) {
+                commonFty.alertPopup('已使用过支付宝支付，请选择其他支付方式支付');
+                return false;
+              }
+              break;
+            case '3':
+              if (hasWxpay) {
+                commonFty.alertPopup('已使用过微信支付，请选择其他支付方式支付');
+                return false;
+              }
+              break;
+            default:
+              break;
+          }
+
           var message = '<input type="number" placeholder="请输入支付金额" id="total-amount">' +
             '<br/>' +
             '<input type="number" placeholder="请输入付款码" id="auth-code">';
@@ -485,7 +502,8 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
           function (response) {
             if (response)
               if (response.biz_response.return_code == 100000) {
-                payOrder(pm, totalAmount);
+                // TODO 微信返回 total_amount 转化成元
+                payOrder(pm, response.biz_response.total_amount);
               } else {
                 commonFty.alertPopup(response.biz_response.return_msg);
               }
@@ -601,6 +619,17 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
         $scope.tradeData.hasPay = hasPay;
         $scope.tradeData.noPay = noPay;
         $scope.tradeData.change = change;
+
+        switch (pm["paycode"]) {
+          case '2':
+            hasAlipay = true;
+            break;
+          case '3':
+            hasWxpay = true;
+            break;
+          default:
+            break;
+        }
       }
 
       /**
@@ -609,7 +638,7 @@ angular.module('trade.controller', ['trade.service', 'common.service'])
        * @param p 要删除的支付方式
        */
       function deleteLinePay(p) {
-        if (pm["paycode"] == "2" || pm["paycode"] == "3" || pm["paycode"] == "2") {
+        if (pm["paycode"] == "2" || pm["paycode"] == "3" || pm["paycode"] == "10") {
           commonFty.alertPopup('该支付方式不允许删除');
         }
 
